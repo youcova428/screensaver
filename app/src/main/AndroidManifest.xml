@@ -19,7 +19,8 @@
         <service
             android:name=".ScreenSaver"
             android:exported="true"
-            android:label="Picture ScreenSaver">
+            android:label="Picture ScreenSaver"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.service.dreams.DreamService" />

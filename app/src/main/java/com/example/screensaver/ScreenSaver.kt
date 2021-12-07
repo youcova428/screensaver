@@ -6,8 +6,10 @@ import android.widget.ImageView
 import java.io.IOException
 
 class ScreenSaver : DreamService() {
-    override fun onDreamingStarted() {
-        super.onDreamingStarted()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        isInteractive = false
         isFullscreen = true
         isScreenBright = false
         setContentView(R.layout.screen_saver)

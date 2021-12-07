@@ -12,9 +12,5 @@ class MainActivity : AppCompatActivity(){
 
         val serviceIntent = Intent(this, ScreenSaver::class.java)
         startService(serviceIntent)
-
-
-
-
     }
 }
