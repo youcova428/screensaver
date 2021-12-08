@@ -13,7 +13,20 @@ class ScreenSaver : DreamService() {
         isFullscreen = true
         isScreenBright = false
         setContentView(R.layout.screen_saver)
+//        findViewById<ImageView>(R.id.screen_picture).setImageResource(R.drawable.pict_mvis)
+    }
+
+    override fun onDreamingStarted() {
+        super.onDreamingStarted()
         findViewById<ImageView>(R.id.screen_picture).setImageResource(R.drawable.pict_mvis)
+    }
+
+    override fun onDreamingStopped() {
+        super.onDreamingStopped()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
     }
 
     fun getDrawableFromAsset(url: String): Drawable? {
