@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.preference.Preference
 import android.provider.Settings
 import android.service.dreams.DreamService
+import android.widget.Button
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
@@ -40,6 +41,14 @@ class MainActivity : FragmentActivity(){
         switchScreenBright.setOnCheckedChangeListener { _, isChecked ->
             sharedPreferences.edit().putBoolean("isScreenBright",isChecked)
             sharedPreferences.edit().apply()
+        }
+
+        val photoButton = findViewById<Button>(R.id.photo_button)
+        photoButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.setType("image/*")
+            startActivityForResult(intent,1000)
         }
     }
 }
