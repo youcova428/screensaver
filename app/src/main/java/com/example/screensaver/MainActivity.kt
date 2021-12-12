@@ -3,21 +3,26 @@ package com.example.screensaver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Switch
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(R.layout.activity_main) {
+
+    var imageView: ImageView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-//        val serviceIntent = Intent(this, ScreenSaver::class.java)
-//        serviceIntent.action = Settings.ACTION_DREAM_SETTINGS
-//        startService(serviceIntent)
+        imageView = findViewById<ImageView>(R.id.image_view)
+        //デフォルトでとんかつの画像が挿入される
+        imageView!!.setImageResource(R.drawable.pict_mvis)
 
         val sharedPreferences: SharedPreferences =
             getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
@@ -42,18 +47,40 @@ class MainActivity : FragmentActivity() {
             sharedPreferences.edit().apply()
         }
 
+
         val photoButton = findViewById<Button>(R.id.photo_button)
         photoButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.setType("image/*")
-            //startActivityForResultから書き換え
-            activityResultLauncher.launch("image/*")
+            selectPhoto()
         }
     }
 
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { url ->
-            Log.d("tag", "uri =${url}")
+    private val activityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d("registerForActivityRegister(result)", result.toString())
+        if (result.resultCode != RESULT_OK) {
+            return@registerForActivityResult
+        } else {
+            try {
+                result.data?.data?.also { uri: Uri ->
+                    val inputStream = contentResolver?.openInputStream(uri)
+                    val image = BitmapFactory.decodeStream(inputStream)
+                    val imageView = findViewById<ImageView>(R.id.image_view)
+                    imageView.setImageBitmap(image)
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "エラーが発生しました", Toast.LENGTH_LONG).show()
+            }
         }
+    }
+
+    private fun selectPhoto() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        activityResultLauncher.launch(intent)
+    }
+
+
 }
