@@ -3,9 +3,11 @@ package com.example.screensaver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
@@ -17,6 +19,7 @@ import androidx.fragment.app.FragmentActivity
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     var imageView: ImageView? = null
+    var image : Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +54,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         val photoButton = findViewById<Button>(R.id.photo_button)
         photoButton.setOnClickListener {
             selectPhoto()
+            //fixme 画面遷移しない
+            val intent = Intent(this, ScreenSaver::class.java)
+            intent.putExtra("ImageBitmap",image)
+            startActivity(intent)
         }
     }
 
@@ -64,7 +71,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             try {
                 result.data?.data?.also { uri: Uri ->
                     val inputStream = contentResolver?.openInputStream(uri)
-                    val image = BitmapFactory.decodeStream(inputStream)
+                    image = BitmapFactory.decodeStream(inputStream)
                     val imageView = findViewById<ImageView>(R.id.image_view)
                     imageView.setImageBitmap(image)
                 }
