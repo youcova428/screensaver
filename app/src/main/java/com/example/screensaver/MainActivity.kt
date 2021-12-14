@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.service.dreams.DreamService
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
@@ -58,6 +59,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             val intent = Intent(this, ScreenSaver::class.java)
             intent.putExtra("ImageBitmap",image)
             startActivity(intent)
+
         }
     }
 

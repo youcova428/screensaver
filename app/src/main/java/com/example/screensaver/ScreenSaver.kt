@@ -1,11 +1,18 @@
 package com.example.screensaver
 
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.provider.ContactsContract.Intents.Insert.ACTION
 import android.service.dreams.DreamService
 import android.widget.ImageView
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.IOException
 
 class ScreenSaver : DreamService() {
+
+    val ACTION_IS_RUNNING = "DreamService_is_running"
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -38,6 +45,10 @@ class ScreenSaver : DreamService() {
             e.printStackTrace()
         }
         return null
+    }
+
+    fun isMyServiceRunning(context: Context) : Boolean{
+        return LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_IS_RUNNING))
     }
 
 }
