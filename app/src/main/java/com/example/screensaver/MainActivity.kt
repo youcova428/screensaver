@@ -20,7 +20,9 @@ import androidx.fragment.app.FragmentActivity
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     var imageView: ImageView? = null
-    var image : Bitmap? = null
+    companion object{
+        var image : Bitmap? = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,14 +57,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         val photoButton = findViewById<Button>(R.id.photo_button)
         photoButton.setOnClickListener {
             selectPhoto()
-            //fixme 画面遷移しない
-            val intent = Intent(this, ScreenSaver::class.java)
-            intent.putExtra("ImageBitmap",image)
-            startActivity(intent)
+        }
 
+        val dreamServiceButton = findViewById<Button>(R.id.service_dream_start_button)
+        dreamServiceButton.setOnClickListener {
+            val intent = Intent(Settings.ACTION_DREAM_SETTINGS)
+            startActivity(intent)
         }
     }
 
+    /**
+     * selectPhoto()の結果を受け取りImageViewに挿入する
+     */
     private val activityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -83,6 +89,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     }
 
+    /**
+     *画像フォルダから写真を選択する
+     */
     private fun selectPhoto() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)

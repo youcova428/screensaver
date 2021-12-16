@@ -70,17 +70,28 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_switch_screenbright"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/service_dream_start_button"
         android:text="写真"/>
+
+    <Button
+        android:id="@+id/service_dream_start_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/text_switch_screenbright"
+        app:layout_constraintStart_toEndOf="@id/photo_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="DREAM"/>
 
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:scaleType="fitXY"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/photo_button" />
+        app:layout_constraintTop_toBottomOf="@id/photo_button"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

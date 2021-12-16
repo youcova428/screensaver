@@ -8,11 +8,13 @@ import android.provider.ContactsContract.Intents.Insert.ACTION
 import android.service.dreams.DreamService
 import android.widget.ImageView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.screensaver.MainActivity.Companion.image
 import java.io.IOException
 
 class ScreenSaver : DreamService() {
 
     val ACTION_IS_RUNNING = "DreamService_is_running"
+    var screenImage : ImageView? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -20,12 +22,16 @@ class ScreenSaver : DreamService() {
         isFullscreen = true
         isScreenBright = false
         setContentView(R.layout.screen_saver)
-//        findViewById<ImageView>(R.id.screen_picture).setImageResource(R.drawable.pict_mvis)
+        screenImage = findViewById(R.id.screen_picture)
     }
 
     override fun onDreamingStarted() {
         super.onDreamingStarted()
-        findViewById<ImageView>(R.id.screen_picture).setImageResource(R.drawable.pict_mvis)
+        if(image != null) {
+            screenImage!!.setImageBitmap(image)
+        }else {
+            screenImage!!.setImageResource(R.drawable.pict_mvis)
+        }
     }
 
     override fun onDreamingStopped() {
