@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.service.dreams.DreamService
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
@@ -20,8 +19,9 @@ import androidx.fragment.app.FragmentActivity
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     var imageView: ImageView? = null
-    companion object{
-        var image : Bitmap? = null
+
+    companion object {
+        var image: Bitmap? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +56,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
         val photoButton = findViewById<Button>(R.id.photo_button)
         photoButton.setOnClickListener {
-            selectPhoto()
+            multiSelectPhoto()
         }
 
         val dreamServiceButton = findViewById<Button>(R.id.service_dream_start_button)
@@ -89,15 +89,38 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     }
 
+    //fixme 複数の画像を選択した際の書き方がおかしい。
+    private val multiActivityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { it ->
+            if (it != null) {
+                for (imageUri in it) {
+                    Log.d("tag",imageUri.toString())
+                }
+            }
+        }
+
     /**
-     *画像フォルダから写真を選択する
+     *画像フォルダから1枚写真を選択する
      */
-    private fun selectPhoto() {
+    private fun singleSelectPhoto() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "image/*"
         }
         activityResultLauncher.launch(intent)
+    }
+
+    /**
+     *画像フォルダから複数枚写真を選択する
+     */
+    private fun multiSelectPhoto() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            //マルチ選択可能になる
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+        //fixme エラーが出る
+        multiActivityResultLauncher.launch("image/*")
     }
 
 
