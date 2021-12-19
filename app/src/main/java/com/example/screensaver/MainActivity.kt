@@ -80,8 +80,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 result.data?.data?.also { uri: Uri ->
                     val inputStream = contentResolver?.openInputStream(uri)
                     image = BitmapFactory.decodeStream(inputStream)
-                    val imageView = findViewById<ImageView>(R.id.image_view)
-                    imageView.setImageBitmap(image)
+                    imageView!!.setImageBitmap(image)
                 }
             } catch (e: Exception) {
                 Toast.makeText(this, "エラーが発生しました", Toast.LENGTH_LONG).show()
@@ -89,12 +88,20 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     }
 
-    //fixme 複数の画像を選択した際の書き方がおかしい。
+
     private val multiActivityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { it ->
-            if (it != null) {
-                for (imageUri in it) {
-                    Log.d("tag",imageUri.toString())
+        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
+            if (uriList != null) {
+                for (imageUri in uriList) {
+                    Log.d("tag", imageUri.toString())
+                }
+                if (uriList.size != 0) {
+                    //TODO GridView or ListViewでアプリ内で写真を選択できるようにする
+                    val inputSteam = contentResolver?.openInputStream(uriList.first())
+                    image = BitmapFactory.decodeStream(inputSteam)
+                    imageView!!.setImageBitmap(image)
+                } else {
+                    imageView!!.setImageResource(R.drawable.pict_mvis)
                 }
             }
         }
@@ -114,12 +121,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
      *画像フォルダから複数枚写真を選択する
      */
     private fun multiSelectPhoto() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            //マルチ選択可能になる
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }
-        //fixme エラーが出る
         multiActivityResultLauncher.launch("image/*")
     }
 
