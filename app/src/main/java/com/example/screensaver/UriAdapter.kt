@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
-class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<UriAdapter.ViewHolder>() {
+class UriAdapter(private val dataSet: MutableList<Uri>) :
+    RecyclerView.Adapter<UriAdapter.ViewHolder>() {
 
     private lateinit var listener: OnImageItemClickListener
+    private lateinit var longClickListener: OnImageItemLongClickListener
 
 
     /**
@@ -17,6 +19,10 @@ class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<U
      */
     interface OnImageItemClickListener {
         fun OnItemClick(uri: Uri)
+    }
+
+    interface OnImageItemLongClickListener {
+        fun OnItemLongClick(position: Int)
     }
 
     /**
@@ -29,7 +35,6 @@ class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<U
         init {
             imageView = view.findViewById(R.id.recyclerview_item_image)
         }
-
     }
 
     /**
@@ -53,6 +58,10 @@ class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<U
         holder.imageView!!.setOnClickListener {
             listener.OnItemClick(dataSet[position])
         }
+        holder.imageView!!.setOnLongClickListener {
+            longClickListener.OnItemLongClick(position)
+            return@setOnLongClickListener true
+        }
     }
 
     /**
@@ -64,15 +73,28 @@ class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<U
      * アダプターの各アイテムのクリックリスナー
      * @param listener
      */
-    fun setOnImageItemClicklistener(listener: OnImageItemClickListener) {
+    fun setOnImageItemClickListener(listener: OnImageItemClickListener) {
         this.listener = listener
+    }
+
+    fun setImageItemLongClickListener(longClickListener: OnImageItemLongClickListener) {
+        this.longClickListener = longClickListener
     }
 
     /**
      * アイテムを追加する
      */
-    fun updateItem(newUris : Array<Uri>){
+    fun updateItem(newUris: Array<Uri>) {
         this.dataSet.clear()
         this.dataSet.addAll(newUris)
     }
+
+    /**
+     * アイテムを削除する
+     */
+    fun removeItem(position: Int) {
+        this.dataSet.removeAt(position)
+        notifyDataSetChanged()
+    }
+
 }

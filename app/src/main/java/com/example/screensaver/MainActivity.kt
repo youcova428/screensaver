@@ -33,9 +33,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        imageView = findViewById<ImageView>(R.id.image_view)
-        //デフォルトでとんかつの画像が挿入される
-//        imageView!!.setImageResource(R.drawable.pict_mvis)
         mUriList = mutableListOf()
 
         val sharedPreferences: SharedPreferences =
@@ -111,17 +108,14 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null && uriList.size != 0) {
                 if (exampleList!!.isNotEmpty()) {
-                    //既存リストに無ければ追加する　既存リストをSharedPreferences かdatabaseかにする
-                    val addUriList = exampleList!!.union(uriList)
-                    for (addListUri in addUriList) {
-                        Log.d("tag", "画像追加 ${addListUri.toString()}")
-                    }
-                    if (!addUriList.equals(exampleList)) {
-                        itemAdapter.updateItem(addUriList.toTypedArray())
-                        itemAdapter.notifyDataSetChanged()
-                    }
+                    //TODO 既存リストに無ければ追加する　既存リストをSharedPreferences かdatabaseかにする
+                    addUriList(exampleList!!, uriList)
                 } else {
-                    setUpRecyclerView(uriList.toTypedArray());
+                    if (recyclerView.layoutManager != null) {
+                        addUriList(exampleList!!, uriList)
+                    } else {
+                        setUpRecyclerView(uriList.toTypedArray())
+                    }
                 }
             } else {
                 mImageView!!.setImageResource(R.drawable.pict_mvis)
@@ -150,21 +144,38 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         itemAdapter = UriAdapter(exampleList!!)
         with(recyclerView) {
             adapter = itemAdapter
-            //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ
+            //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ　もっときれいにしたい
             layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
                     gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                 }
         }
         //ItemClickListener実装
-        itemAdapter.setOnImageItemClicklistener(object : UriAdapter.OnImageItemClickListener {
+        itemAdapter.setOnImageItemClickListener(object : UriAdapter.OnImageItemClickListener {
             override fun OnItemClick(uri: Uri) {
                 Log.d("tag", "画像クリック ${uri.toString()}")
                 val inputStream = contentResolver?.openInputStream(uri)
                 image = BitmapFactory.decodeStream(inputStream)
             }
         })
+
+        itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
+            override fun OnItemLongClick(position: Int) {
+                itemAdapter.removeItem(position)
+                itemAdapter.notifyItemRemoved(position)
+            }
+        })
     }
 
+    private fun addUriList(exitingList: MutableList<Uri>, uriList: MutableList<Uri>) {
+        val addUriList = exitingList!!.union(uriList)
+        for (addListUri in addUriList) {
+            Log.d("tag", "画像追加 ${addListUri.toString()}")
+        }
+        if (!addUriList.equals(exitingList)) {
+            itemAdapter.updateItem(addUriList.toTypedArray())
+            itemAdapter.notifyDataSetChanged()
+        }
+    }
 
 }
