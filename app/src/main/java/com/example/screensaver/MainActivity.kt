@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -72,6 +73,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             val intent = Intent(Settings.ACTION_DREAM_SETTINGS)
             startActivity(intent)
         }
+
     }
 
     /**
@@ -101,12 +103,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null) {
                 for (imageUri in uriList) {
-                    Log.d("tag", imageUri.toString())
+                    Log.d("tag", "画像選択 ${imageUri.toString()}")
                 }
                 if (uriList.size != 0) {
-//                    val inputSteam = contentResolver?.openInputStream(uriList.first())
-//                    image = BitmapFactory.decodeStream(inputSteam)
-//                    imageView!!.setImageBitmap(image)
                     setUpRecyclerView(uriList.toTypedArray());
                 } else {
                     imageView!!.setImageResource(R.drawable.pict_mvis)
@@ -142,6 +141,14 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                 }
         }
+        //ItemClickListener実装
+        itemAdapter.setOnImageItemClicklistener(object : UriAdapter.OnImageItemClickListener {
+            override fun OnItemClick(uri: Uri) {
+                Log.d("tag", "画像クリック ${uri.toString()}")
+                val inputStream = contentResolver?.openInputStream(uri)
+                image = BitmapFactory.decodeStream(inputStream)
+            }
+        })
     }
 
 

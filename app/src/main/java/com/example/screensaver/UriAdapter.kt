@@ -9,6 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 
 class UriAdapter(private val dataSet: Array<Uri>) : RecyclerView.Adapter<UriAdapter.ViewHolder>() {
 
+    private lateinit var listener: OnImageItemClickListener
+
+
+    /**
+     * アイテムクリックリスナーのインターフェース
+     */
+    interface OnImageItemClickListener {
+        fun OnItemClick(uri: Uri)
+    }
+
     /**
      * リスト内の各アイテムのレイアウト内を含むViewのラッパー
      * @param view
@@ -40,6 +50,9 @@ class UriAdapter(private val dataSet: Array<Uri>) : RecyclerView.Adapter<UriAdap
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.imageView!!.setImageURI(dataSet[position])
+        holder.imageView!!.setOnClickListener {
+            listener.OnItemClick(dataSet[position])
+        }
     }
 
     /**
@@ -47,5 +60,11 @@ class UriAdapter(private val dataSet: Array<Uri>) : RecyclerView.Adapter<UriAdap
      */
     override fun getItemCount() = dataSet.size
 
-    //todo ItemClickListener interface? 実装
+    /**
+     * アダプターの各アイテムのクリックリスナー
+     * @param listener
+     */
+    fun setOnImageItemClicklistener(listener: OnImageItemClickListener) {
+        this.listener = listener
+    }
 }
