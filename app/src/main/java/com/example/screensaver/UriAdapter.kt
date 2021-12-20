@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
-class UriAdapter(private val dataSet: Array<Uri>) : RecyclerView.Adapter<UriAdapter.ViewHolder>() {
+class UriAdapter(private val dataSet: MutableList<Uri>) : RecyclerView.Adapter<UriAdapter.ViewHolder>() {
 
     private lateinit var listener: OnImageItemClickListener
 
@@ -66,5 +66,13 @@ class UriAdapter(private val dataSet: Array<Uri>) : RecyclerView.Adapter<UriAdap
      */
     fun setOnImageItemClicklistener(listener: OnImageItemClickListener) {
         this.listener = listener
+    }
+
+    /**
+     * アイテムを追加する
+     */
+    fun updateItem(newUris : Array<Uri>){
+        this.dataSet.clear()
+        this.dataSet.addAll(newUris)
     }
 }

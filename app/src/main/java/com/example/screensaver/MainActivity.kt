@@ -20,7 +20,10 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
-    var imageView: ImageView? = null
+    var mImageView: ImageView? = null
+    var mUriList: MutableList<Uri>? = null
+    lateinit var itemAdapter: UriAdapter
+    var exampleList: MutableList<Uri>? = null
 
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
 
@@ -33,6 +36,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 //        imageView = findViewById<ImageView>(R.id.image_view)
         //デフォルトでとんかつの画像が挿入される
 //        imageView!!.setImageResource(R.drawable.pict_mvis)
+        mUriList = mutableListOf()
 
         val sharedPreferences: SharedPreferences =
             getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
@@ -74,6 +78,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             startActivity(intent)
         }
 
+        val exampleUri = Uri.parse("android.resource://${packageName}/drawable/pict_mvis")
+        exampleList = mutableListOf(exampleUri)
+        setUpRecyclerView(exampleList!!.toTypedArray())
+        Log.d("tag", "onCreate")
     }
 
     /**
@@ -101,15 +109,22 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
-            if (uriList != null) {
-                for (imageUri in uriList) {
-                    Log.d("tag", "画像選択 ${imageUri.toString()}")
-                }
-                if (uriList.size != 0) {
-                    setUpRecyclerView(uriList.toTypedArray());
+            if (uriList != null && uriList.size != 0) {
+                if (exampleList!!.isNotEmpty()) {
+                    //既存リストに無ければ追加する　既存リストをSharedPreferences かdatabaseかにする
+                    val addUriList = exampleList!!.union(uriList)
+                    for (addListUri in addUriList) {
+                        Log.d("tag", "画像追加 ${addListUri.toString()}")
+                    }
+                    if (!addUriList.equals(exampleList)) {
+                        itemAdapter.updateItem(addUriList.toTypedArray())
+                        itemAdapter.notifyDataSetChanged()
+                    }
                 } else {
-                    imageView!!.setImageResource(R.drawable.pict_mvis)
+                    setUpRecyclerView(uriList.toTypedArray());
                 }
+            } else {
+                mImageView!!.setImageResource(R.drawable.pict_mvis)
             }
         }
 
@@ -132,7 +147,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     private fun setUpRecyclerView(uriList: Array<Uri>) {
-        var itemAdapter = UriAdapter(uriList)
+        itemAdapter = UriAdapter(exampleList!!)
         with(recyclerView) {
             adapter = itemAdapter
             //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ
