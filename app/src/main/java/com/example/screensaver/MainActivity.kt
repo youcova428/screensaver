@@ -24,7 +24,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     var mUriList: MutableList<Uri>? = null
     lateinit var itemAdapter: UriAdapter
     var exampleList: MutableList<Uri>? = null
-
+    private lateinit var sharedPreferences : SharedPreferences
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
 
     companion object {
@@ -33,10 +33,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mUriList = mutableListOf()
 
-        val sharedPreferences: SharedPreferences =
-            getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
+        mUriList = mutableListOf()
+        sharedPreferences = getSharedPreferences("ScreenSaver", Context.MODE_PRIVATE)
+
         val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
         switchInteractive.isChecked = sharedPreferences.getBoolean("isInteractive", true)
         switchInteractive.setOnCheckedChangeListener { _, isChecked ->
@@ -75,10 +75,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             startActivity(intent)
         }
 
-        val exampleUri = Uri.parse("android.resource://${packageName}/drawable/pict_mvis")
-        exampleList = mutableListOf(exampleUri)
-        setUpRecyclerView(exampleList!!.toTypedArray())
+//        val exampleUri = Uri.parse("android.resource://${packageName}/drawable/pict_mvis")
+//        exampleList = mutableListOf(exampleUri)
+//        setUpRecyclerView(exampleList!!.toTypedArray())
         Log.d("tag", "onCreate")
+
+        val uriSet = sharedPreferences.getStringSet("uriListSet",mutableSetOf<String>())
+        val uriArray = uriSet!!.toTypedArray()
+        var uriMutableArray = mutableListOf<Uri>()
+        for(uriString in uriArray){
+            uriMutableArray.add(Uri.parse(uriString))
+        }
+        exampleList = uriMutableArray
     }
 
     /**
@@ -109,12 +117,53 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             if (uriList != null && uriList.size != 0) {
                 if (exampleList!!.isNotEmpty()) {
                     //TODO 既存リストに無ければ追加する　既存リストをSharedPreferences かdatabaseかにする
-                    addUriList(exampleList!!, uriList)
+                    val addUriList = createAddUriList(exampleList!!, uriList)
+                    if (addUriList != (exampleList)) {
+                        itemAdapter.updateItem(addUriList.toTypedArray())
+                        itemAdapter.notifyDataSetChanged()
+                    }
+                    var uriString : String
+                    var uriStringSet = mutableSetOf<String>()
+
+                    for(uri in addUriList){
+                        uriString = uri.toString()
+                        uriStringSet.add(uriString)
+                    }
+                    sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
                 } else {
                     if (recyclerView.layoutManager != null) {
-                        addUriList(exampleList!!, uriList)
+                        //uriListが場合
+                        val addUriList = createAddUriList(exampleList!!, uriList)
+                        if (addUriList != exampleList) {
+                            itemAdapter.updateItem(addUriList.toTypedArray())
+                            itemAdapter.notifyDataSetChanged()
+                        }
+                        //sharedPreference追加する
+                        var uriString : String
+                        var uriStringSet = mutableSetOf<String>()
+
+                        for(uri in addUriList){
+                            uriString = uri.toString()
+                            uriStringSet.add(uriString)
+                        }
+                        sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
+
                     } else {
+                        //RecyclerViewが設置されていないが場合(初回), SharedPreferencesからUriSetを取得する
                         setUpRecyclerView(uriList.toTypedArray())
+                        if(!uriList.isNullOrEmpty()){
+                            itemAdapter.updateItem(uriList.toTypedArray())
+                            itemAdapter.notifyDataSetChanged()
+                        }
+
+                        var uriString : String
+                        var uriStringSet = mutableSetOf<String>()
+
+                        for(uri in uriList){
+                            uriString = uri.toString()
+                            uriStringSet.add(uriString)
+                        }
+                        sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
                     }
                 }
             } else {
@@ -159,6 +208,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             }
         })
 
+        //ItemLongClickListener実装
         itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
             override fun OnItemLongClick(position: Int) {
                 itemAdapter.removeItem(position)
@@ -167,15 +217,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         })
     }
 
-    private fun addUriList(exitingList: MutableList<Uri>, uriList: MutableList<Uri>) {
+    private fun createAddUriList(
+        exitingList: MutableList<Uri>,
+        uriList: MutableList<Uri>
+    ): Set<Uri> {
         val addUriList = exitingList!!.union(uriList)
         for (addListUri in addUriList) {
             Log.d("tag", "画像追加 ${addListUri.toString()}")
         }
-        if (!addUriList.equals(exitingList)) {
-            itemAdapter.updateItem(addUriList.toTypedArray())
-            itemAdapter.notifyDataSetChanged()
-        }
+        return addUriList
+//        if (!addUriList.equals(exitingList)) {
+//            itemAdapter.updateItem(addUriList.toTypedArray())
+//            itemAdapter.notifyDataSetChanged()
+//        }
     }
-
 }
