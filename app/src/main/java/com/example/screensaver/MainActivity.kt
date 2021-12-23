@@ -17,6 +17,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.nio.file.Files.size
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
@@ -24,7 +27,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     var mUriList: MutableList<Uri>? = null
     lateinit var itemAdapter: UriAdapter
     var exampleList: MutableList<Uri>? = null
-    private lateinit var sharedPreferences : SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
 
     companion object {
@@ -80,13 +83,13 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 //        setUpRecyclerView(exampleList!!.toTypedArray())
         Log.d("tag", "onCreate")
 
-        val uriSet = sharedPreferences.getStringSet("uriListSet",mutableSetOf<String>())
-        val uriArray = uriSet!!.toTypedArray()
-        var uriMutableArray = mutableListOf<Uri>()
-        for(uriString in uriArray){
-            uriMutableArray.add(Uri.parse(uriString))
-        }
-        exampleList = uriMutableArray
+//        val uriSet = sharedPreferences.getStringSet("uriListSet", mutableSetOf<String>())
+//        val uriArray = uriSet!!.toTypedArray()
+//        var uriMutableArray = mutableListOf<Uri>()
+//        for (uriString in uriArray) {
+//            uriMutableArray.add(Uri.parse(uriString))
+//        }
+        exampleList = getUriArray("uri_collections",sharedPreferences)
     }
 
     /**
@@ -117,53 +120,55 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             if (uriList != null && uriList.size != 0) {
                 if (exampleList!!.isNotEmpty()) {
                     //TODO 既存リストに無ければ追加する　既存リストをSharedPreferences かdatabaseかにする
-                    val addUriList = createAddUriList(exampleList!!, uriList)
-                    if (addUriList != (exampleList)) {
-                        itemAdapter.updateItem(addUriList.toTypedArray())
+                    val addUriSet = createAddUriList(exampleList!!, uriList)
+                    if (addUriSet != (exampleList)) {
+                        itemAdapter.updateItem(addUriSet.toTypedArray())
                         itemAdapter.notifyDataSetChanged()
                     }
-                    var uriString : String
-                    var uriStringSet = mutableSetOf<String>()
-
-                    for(uri in addUriList){
-                        uriString = uri.toString()
-                        uriStringSet.add(uriString)
-                    }
-                    sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
+//                    var uriString: String
+//                    var uriStringSet = mutableSetOf<String>()
+//
+//                    for (uri in addUriList) {
+//                        uriString = uri.toString()
+//                        uriStringSet.add(uriString)
+//                    }
+//                    sharedPreferences.edit().putStringSet("uriListSet", uriStringSet).apply()
+                        saveUriSet(addUriSet, "uri_collections", sharedPreferences)
                 } else {
                     if (recyclerView.layoutManager != null) {
                         //uriListが場合
-                        val addUriList = createAddUriList(exampleList!!, uriList)
-                        if (addUriList != exampleList) {
-                            itemAdapter.updateItem(addUriList.toTypedArray())
+                        val addUriSet = createAddUriList(exampleList!!, uriList)
+                        if (addUriSet != exampleList) {
+                            itemAdapter.updateItem(addUriSet.toTypedArray())
                             itemAdapter.notifyDataSetChanged()
                         }
                         //sharedPreference追加する
-                        var uriString : String
-                        var uriStringSet = mutableSetOf<String>()
-
-                        for(uri in addUriList){
-                            uriString = uri.toString()
-                            uriStringSet.add(uriString)
-                        }
-                        sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
-
+//                        var uriString: String
+//                        var uriStringSet = mutableSetOf<String>()
+//
+//                        for (uri in addUriList) {
+//                            uriString = uri.toString()
+//                            uriStringSet.add(uriString)
+//                        }
+//                        sharedPreferences.edit().putStringSet("uriListSet", uriStringSet).apply()
+                        saveUriSet(addUriSet, "uri_collections", sharedPreferences)
                     } else {
                         //RecyclerViewが設置されていないが場合(初回), SharedPreferencesからUriSetを取得する
                         setUpRecyclerView(uriList.toTypedArray())
-                        if(!uriList.isNullOrEmpty()){
+                        if (!uriList.isNullOrEmpty()) {
                             itemAdapter.updateItem(uriList.toTypedArray())
                             itemAdapter.notifyDataSetChanged()
                         }
 
-                        var uriString : String
-                        var uriStringSet = mutableSetOf<String>()
-
-                        for(uri in uriList){
-                            uriString = uri.toString()
-                            uriStringSet.add(uriString)
-                        }
-                        sharedPreferences.edit().putStringSet("uriListSet",uriStringSet).apply()
+//                        var uriString: String
+//                        var uriStringSet = mutableSetOf<String>()
+//
+//                        for (uri in uriList) {
+//                            uriString = uri.toString()
+//                            uriStringSet.add(uriString)
+//                        }
+//                        sharedPreferences.edit().putStringSet("uriListSet", uriStringSet).apply()
+                        saveUriSet(uriList, "uri_collections", sharedPreferences)
                     }
                 }
             } else {
@@ -230,5 +235,31 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 //            itemAdapter.updateItem(addUriList.toTypedArray())
 //            itemAdapter.notifyDataSetChanged()
 //        }
+    }
+
+    fun saveUriSet(uriSet: Set<Uri>, key: String, sharedPreferences: SharedPreferences) {
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(uriSet)
+        editor.putString(key, json)
+        editor.apply()
+    }
+
+
+    fun saveUriSet(uriList: List<Uri>, key: String, sharedPreferences: SharedPreferences) {
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(uriList)
+        editor.putString(key, json)
+        editor.apply()
+    }
+
+
+    fun getUriArray(key: String, sharedPreferences: SharedPreferences): MutableList<Uri> {
+        val gson = Gson()
+        val emptyList = Gson().toJson(mutableListOf<Uri>())
+        val json = sharedPreferences.getString(key, emptyList)
+        val type = object : TypeToken<Array<Uri>>() {}.type
+        return gson.fromJson(json,type)
     }
 }
