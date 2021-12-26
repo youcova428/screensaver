@@ -21,14 +21,15 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.reflect.Array.get
 import java.lang.reflect.Type
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     var mImageView: ImageView? = null
-    var mUriList: MutableList<Uri>? = null
+    var mUriList: MutableList<Image>? = null
     lateinit var itemAdapter: UriAdapter
-    var exampleMutableList: MutableList<Uri>? = null
+    var exampleMutableList: MutableList<Image>? = null
     private lateinit var sharedPreferences: SharedPreferences
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
     private lateinit var exampleList: MutableList<Uri>
@@ -93,8 +94,11 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 //        for (uriString in uriArray) {
 //            uriMutableArray.add(Uri.parse(uriString))
 //        }
-//        exampleMutableList = getUriArray("uri_collections",sharedPreferences)
-        exampleMutableList = mutableListOf()
+        exampleMutableList = getUriArray("uri_collections_new", sharedPreferences)
+//        for (image in exampleMutableList!!) {
+//            exampleList.add(image.uri!!)
+//        }
+
 //        exampleList = getUriArray("uri_collections", sharedPreferences)
     }
 
@@ -124,31 +128,40 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null && uriList.size != 0) {
-                if (exampleMutableList!!.isNotEmpty()) {
-                    val addUriSet = createAddUriList(exampleMutableList!!, uriList)
+                if (exampleMutableList!!.isNotEmpty() && exampleMutableList != null) {
+                    val addUriSet = createAddUriList(exampleList!!, uriList)
                     if (addUriSet != (exampleMutableList)) {
                         itemAdapter.updateItem(addUriSet.toTypedArray())
                         itemAdapter.notifyDataSetChanged()
                     }
-                    saveUriSet(addUriSet, "uri_collections", sharedPreferences)
+                    saveUriSet(uriListConvert(exampleList), "uri_collections", sharedPreferences)
                 } else {
                     if (recyclerView.layoutManager != null) {
                         //uriListが場合
-                        val addUriSet = createAddUriList(exampleMutableList!!, uriList)
+                        val addUriSet = createAddUriList(exampleList!!, uriList)
                         if (addUriSet != exampleMutableList) {
                             itemAdapter.updateItem(addUriSet.toTypedArray())
                             itemAdapter.notifyDataSetChanged()
                         }
                         //sharedPreference追加する
-                        saveUriSet(addUriSet, "uri_collections", sharedPreferences)
+                        saveUriSet(
+                            uriListConvert(exampleList),
+                            "uri_collections",
+                            sharedPreferences
+                        )
                     } else {
                         //RecyclerViewが設置されていないが場合(初回), SharedPreferencesからUriSetを取得する
-                        setUpRecyclerView(uriList.toTypedArray())
+                        setUpRecyclerView(uriList)
                         if (!uriList.isNullOrEmpty()) {
                             itemAdapter.updateItem(uriList.toTypedArray())
                             itemAdapter.notifyDataSetChanged()
                         }
-                        saveUriSet(uriList, "uri_collections", sharedPreferences)
+                        //タップから取得したuriListをSharedPreferencesに保存する。
+                        saveUriSet(
+                            uriListConvert(uriList),
+                            "uri_collections_new",
+                            sharedPreferences
+                        )
                     }
                 }
             } else {
@@ -174,8 +187,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         multiActivityResultLauncher.launch("image/*")
     }
 
-    private fun setUpRecyclerView(uriList: Array<Uri>) {
-        itemAdapter = UriAdapter(exampleMutableList!!)
+    private fun setUpRecyclerView(uriList: MutableList<Uri>) {
+        itemAdapter = UriAdapter(uriList)
         with(recyclerView) {
             adapter = itemAdapter
             //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ　もっときれいにしたい
@@ -213,7 +226,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return addUriList
     }
 
-    fun saveUriSet(uriSet: Set<Uri>, key: String, sharedPreferences: SharedPreferences) {
+    fun saveUriSet(uriSet: Set<Image>, key: String, sharedPreferences: SharedPreferences) {
         val editor = sharedPreferences.edit()
         val gson = Gson()
         val json = gson.toJson(uriSet)
@@ -222,20 +235,30 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
 
-    fun saveUriSet(uriList: List<Uri>, key: String, sharedPreferences: SharedPreferences) {
-            val editor = sharedPreferences.edit()
-            val gson = Gson()
-            val json = gson.toJson(uriList)
-            editor.putString(key, json)
-            editor.apply()
+    fun saveUriSet(uriList: List<Image>, key: String, sharedPreferences: SharedPreferences) {
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(uriList)
+        editor.putString(key, json)
+        editor.apply()
     }
 
 
-    fun getUriArray(key: String, sharedPreferences: SharedPreferences): MutableList<Uri> {
+    fun getUriArray(key: String, sharedPreferences: SharedPreferences): MutableList<Image> {
         val gson = Gson()
-        val emptyList = Gson().toJson(mutableListOf<Uri>())
+        val emptyList = Gson().toJson(mutableListOf<Image>())
         val json = sharedPreferences.getString(key, emptyList)
-        val type = object : TypeToken<MutableList<Uri>>() {}.type
-        return gson.fromJson(json,type)
+        val type = object : TypeToken<MutableList<Image>>() {}.type
+        return gson.fromJson(json, type)
+    }
+
+    //todo MutableList<Uri> -> MutableList<Image> 変換メソッド
+    fun uriListConvert(list: MutableList<Uri>): MutableSet<Image> {
+        val mutableSet = mutableSetOf<Image>()
+        for (uri in list) {
+            val image = Image(uri)
+            mutableSet.add(image)
+        }
+        return mutableSet
     }
 }
