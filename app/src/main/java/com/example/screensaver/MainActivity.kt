@@ -94,7 +94,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 //        for (uriString in uriArray) {
 //            uriMutableArray.add(Uri.parse(uriString))
 //        }
-        exampleMutableList = getUriArray("uri_collections_new", sharedPreferences)
+//        exampleMutableList = getUriArray("uri_collections_new", sharedPreferences)
+        exampleMutableList = mutableListOf()
 //        for (image in exampleMutableList!!) {
 //            exampleList.add(image.uri!!)
 //        }
@@ -128,6 +129,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null && uriList.size != 0) {
+                //ShardPrefenecesからUriを取得できたとき
                 if (exampleMutableList!!.isNotEmpty() && exampleMutableList != null) {
                     val addUriSet = createAddUriList(exampleList!!, uriList)
                     if (addUriSet != (exampleMutableList)) {
@@ -136,6 +138,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     }
                     saveUriSet(uriListConvert(exampleList), "uri_collections", sharedPreferences)
                 } else {
+                    //1度立ち上げたが、SharedPrefenecesに保存されていない場合
                     if (recyclerView.layoutManager != null) {
                         //uriListが場合
                         val addUriSet = createAddUriList(exampleList!!, uriList)
@@ -227,9 +230,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     fun saveUriSet(uriSet: Set<Image>, key: String, sharedPreferences: SharedPreferences) {
+        val uriList =  ArrayList(uriSet)
         val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(uriSet)
+        //FIXME EXCEPTIONで落ちる
+        val json = Gson().toJson(uriList)
         editor.putString(key, json)
         editor.apply()
     }
@@ -252,7 +256,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return gson.fromJson(json, type)
     }
 
-    //todo MutableList<Uri> -> MutableList<Image> 変換メソッド
+    //MutableList<Uri> -> MutableList<Image> 変換メソッド
     fun uriListConvert(list: MutableList<Uri>): MutableSet<Image> {
         val mutableSet = mutableSetOf<Image>()
         for (uri in list) {
