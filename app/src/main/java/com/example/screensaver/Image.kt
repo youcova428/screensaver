@@ -3,14 +3,9 @@ package com.example.screensaver
 import android.net.Uri
 import com.google.gson.annotations.SerializedName
 
-class Image {
+class Image constructor(_uri: Uri){
 
     @SerializedName("uriName")
-    var uri: Uri? = null
-        get() = field
-        set(value) {
-            field = uri
-        }
+    var uri: Uri = _uri
 
-    constructor(uri: Uri)
 }
