@@ -31,7 +31,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     companion object {
         var image: Bitmap? = null
-        const val URI_COLLECTION = "uri_collection_1"
+        const val URI_COLLECTION = "uri_collection_2"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,16 +78,16 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             startActivity(intent)
         }
 
-//        val exampleUri = Uri.parse("android.resource://${packageName}/drawable/pict_mvis")
-//        exampleList = mutableListOf(exampleUri)
-//        setUpRecyclerView(exampleList!!.toTypedArray())
         Log.d("tag", "onCreate")
 
-        //todo sharedPreferences から取得する
-//        saveMutableList = mutableListOf()
         saveMutableList = getUriArray(URI_COLLECTION, sharedPreferences)
-    }
+        if(!saveMutableList.isNullOrEmpty()) {
+//            itemAdapter = UriAdapter(imageListConvert(saveMutableList!!))
+            //fixme SecurityException で落ちる　ファイルを開ける権限がないっぽい？
+            setUpRecyclerView(imageListConvert(saveMutableList!!))
+        }
 
+    }
 
     /**
      * selectPhoto()の結果を受け取りImageViewに挿入する
@@ -220,7 +220,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     fun saveUriSet(uriSet: Set<Image>, key: String, sharedPreferences: SharedPreferences) {
-//        val uriList =  ArrayList(uriSet)
         val editor = sharedPreferences.edit()
         val json = Gson().toJson(uriSet)
         editor.putString(key, json)
@@ -243,7 +242,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         Log.d("tag",json!!)
         val type = object : TypeToken<MutableList<Image>>() {}.type
         return Gson().fromJson(json, type)
-//        return uriSet.toMutableList()
     }
 
     //MutableList<Uri> -> MutableSet<Image> 変換メソッド
@@ -256,11 +254,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return mutableSet
     }
 
-    //todo　MutableList<Image> -> Mutable<Uri> 変換メソッド
+    //MutableList<Image> -> MutableList<Uri> 変換メソッド
     private fun imageListConvert(imageList: MutableList<Image>): MutableList<Uri> {
         val uriList = mutableListOf<Uri>()
         for (image in imageList) {
-            //fixme ヌルポになる
             uriList.add(Uri.parse(image.uri))
         }
         return uriList
