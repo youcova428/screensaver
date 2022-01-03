@@ -81,7 +81,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         Log.d("tag", "onCreate")
 
         saveMutableList = getUriArray(URI_COLLECTION, sharedPreferences)
-        if(!saveMutableList.isNullOrEmpty()) {
+        if (!saveMutableList.isNullOrEmpty()) {
 //            itemAdapter = UriAdapter(imageListConvert(saveMutableList!!))
             //fixme SecurityException で落ちる　ファイルを開ける権限がないっぽい？
             setUpRecyclerView(imageListConvert(saveMutableList!!))
@@ -201,10 +201,13 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
         //ItemLongClickListener実装
         itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
+            var removedUriList : MutableList<Uri> = mutableListOf()
             override fun OnItemLongClick(position: Int) {
-                itemAdapter.removeItem(position)
+                removedUriList = itemAdapter.removeItem(position)
                 itemAdapter.notifyItemRemoved(position)
+                saveUriSet(uriListConvert(removedUriList), URI_COLLECTION, sharedPreferences)
             }
+
         })
     }
 
@@ -239,7 +242,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     fun getUriArray(key: String, sharedPreferences: SharedPreferences): MutableList<Image> {
         val emptyList = Gson().toJson(mutableListOf<Image>())
         val json = sharedPreferences.getString(key, emptyList)
-        Log.d("tag",json!!)
+        Log.d("tag", json!!)
         val type = object : TypeToken<MutableList<Image>>() {}.type
         return Gson().fromJson(json, type)
     }

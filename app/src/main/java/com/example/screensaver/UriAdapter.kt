@@ -54,6 +54,7 @@ class UriAdapter(private val dataSet: MutableList<Uri>) :
      * @param position 配列の位置
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        //fixme android 9以降で落ちる。8では問題ない。
         holder.imageView!!.setImageURI(dataSet[position])
         holder.imageView!!.setOnClickListener {
             listener.OnItemClick(dataSet[position])
@@ -92,9 +93,10 @@ class UriAdapter(private val dataSet: MutableList<Uri>) :
     /**
      * アイテムを削除する
      */
-    fun removeItem(position: Int) {
+    fun removeItem(position: Int) : MutableList<Uri>{
         this.dataSet.removeAt(position)
         notifyDataSetChanged()
+        return this.dataSet
     }
 
 }
