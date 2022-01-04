@@ -1,11 +1,13 @@
 package com.example.screensaver
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -13,6 +15,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Switch
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +35,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     companion object {
         var image: Bitmap? = null
         const val URI_COLLECTION = "uri_collection_2"
+        const val OPEN_DOCUMENT_PERMISSION = "open_document_permission"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +88,16 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         if (!saveMutableList.isNullOrEmpty()) {
 //            itemAdapter = UriAdapter(imageListConvert(saveMutableList!!))
             //fixme SecurityException で落ちる　ファイルを開ける権限がないっぽい？
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).also {
+                    it.addCategory(Intent.CATEGORY_OPENABLE)
+                    it.type = "*/*"
+//                    it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+//                    it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startForResult.launch(intent)
+            }
             setUpRecyclerView(imageListConvert(saveMutableList!!))
         }
 
@@ -115,7 +129,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null && uriList.size != 0) {
-                //ShardPrefenecesからUriを取得できたとき
+                //SharedPrefenecesからUriを取得できたとき
                 if (saveMutableList!!.isNotEmpty() && saveMutableList != null) {
                     val addUriSet = createAddUriList(imageListConvert(saveMutableList!!), uriList)
                     if (addUriSet != imageListConvert(saveMutableList!!).toMutableSet()) {
@@ -201,7 +215,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
         //ItemLongClickListener実装
         itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
-            var removedUriList : MutableList<Uri> = mutableListOf()
+            var removedUriList: MutableList<Uri> = mutableListOf()
             override fun OnItemLongClick(position: Int) {
                 removedUriList = itemAdapter.removeItem(position)
                 itemAdapter.notifyItemRemoved(position)
@@ -232,8 +246,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     fun saveUriSet(uriList: List<Image>, key: String, sharedPreferences: SharedPreferences) {
         val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(uriList)
+        val json = Gson().toJson(uriList)
         editor.putString(key, json)
         editor.apply()
     }
@@ -266,4 +279,16 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return uriList
     }
 
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult? ->
+            if(result?.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let{ uri: Uri ->
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    sharedPreferences.edit().putString(OPEN_DOCUMENT_PERMISSION, uri.toString())
+                }
+            }
+        }
 }
