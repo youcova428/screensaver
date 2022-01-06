@@ -1,14 +1,14 @@
 package com.example.screensaver
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
+import android.os.*
+import android.os.Build.VERSION.SDK_INT
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
@@ -36,13 +37,28 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         var image: Bitmap? = null
         const val URI_COLLECTION = "uri_collection_2"
         const val OPEN_DOCUMENT_PERMISSION = "open_document_permission"
+        const val PERMISSIONS_REQUEST_CODE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Permission
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                File(externalStoragePath()).listFiles().map { file ->
+                    println(file.path)
+                }
+            } else {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                    PERMISSIONS_REQUEST_CODE
+                )
+            }
+        }
+
         mUriList = mutableListOf()
-        sharedPreferences = getSharedPreferences("ScreenSaver", Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences("ScreenSaver", MODE_PRIVATE)
 
         val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
         switchInteractive.isChecked = sharedPreferences.getBoolean("isInteractive", true)
@@ -82,22 +98,21 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             startActivity(intent)
         }
 
-        Log.d("tag", "onCreate")
 
         saveMutableList = getUriArray(URI_COLLECTION, sharedPreferences)
-        if (!saveMutableList.isNullOrEmpty()) {
+        if (!saveMutableList.isNullOrEmpty() && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 //            itemAdapter = UriAdapter(imageListConvert(saveMutableList!!))
             //fixme SecurityException で落ちる　ファイルを開ける権限がないっぽい？
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).also {
-                    it.addCategory(Intent.CATEGORY_OPENABLE)
-                    it.type = "*/*"
+//            if (SDK_INT >= Build.VERSION_CODES.P) {
+//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).also {
+//                    it.addCategory(Intent.CATEGORY_OPENABLE)
+//                    it.type = "*/*"type
 //                    it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
 //                    it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-                startForResult.launch(intent)
-            }
+//                }
+//                startForResult.launch(intent)
+//            }
             setUpRecyclerView(imageListConvert(saveMutableList!!))
         }
 
@@ -125,13 +140,13 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     }
 
-
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
             if (uriList != null && uriList.size != 0) {
                 //SharedPrefenecesからUriを取得できたとき
                 if (saveMutableList!!.isNotEmpty() && saveMutableList != null) {
-                    val addUriSet = createAddUriList(imageListConvert(saveMutableList!!), uriList)
+                    val addUriSet =
+                        createAddUriList(imageListConvert(saveMutableList!!), uriList)
                     if (addUriSet != imageListConvert(saveMutableList!!).toMutableSet()) {
                         itemAdapter.updateItem(addUriSet.toTypedArray())
                         itemAdapter.notifyDataSetChanged()
@@ -214,7 +229,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         })
 
         //ItemLongClickListener実装
-        itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
+        itemAdapter.setImageItemLongClickListener(object :
+            UriAdapter.OnImageItemLongClickListener {
             var removedUriList: MutableList<Uri> = mutableListOf()
             override fun OnItemLongClick(position: Int) {
                 removedUriList = itemAdapter.removeItem(position)
@@ -280,9 +296,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     private val startForResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult? ->
-            if(result?.resultCode == Activity.RESULT_OK) {
-                result.data?.data?.let{ uri: Uri ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+            if (result?.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri: Uri ->
                     contentResolver.takePersistableUriPermission(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -291,4 +307,35 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 }
             }
         }
+
+    private fun externalStoragePath(): String {
+        return application.getExternalFilesDir(null).toString()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSIONS_REQUEST_CODE -> {
+                //権限が許可されていた場合
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    File(externalStoragePath()).listFiles().map { file ->
+                        println(file.name)
+                    }
+                } else {
+                    Handler(Looper.getMainLooper()).post(Runnable {
+                        RuntimePermissionUtils().showAlertDialog(
+                            supportFragmentManager,
+                            "ストレージの読み込み"
+                        )
+                    })
+                }
+                return
+            }
+        }
+    }
 }
+
