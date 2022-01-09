@@ -195,7 +195,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     private fun setUpRecyclerView(uriList: MutableList<Uri>) {
-        itemAdapter = UriAdapter(uriList)
+        itemAdapter = UriAdapter(uriList, applicationContext)
         with(recyclerView) {
             adapter = itemAdapter
             //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ　もっときれいにしたい
@@ -279,6 +279,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return uriList
     }
 
+    //SharedPreferencesから受け取ってここに受け取らせる。
     private val startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result: ActivityResult? ->
             if(result?.resultCode == Activity.RESULT_OK) {

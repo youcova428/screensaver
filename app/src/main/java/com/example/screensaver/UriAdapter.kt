@@ -1,13 +1,17 @@
 package com.example.screensaver
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
-class UriAdapter(private val dataSet: MutableList<Uri>) :
+class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Context) :
     RecyclerView.Adapter<UriAdapter.ViewHolder>() {
 
     private lateinit var listener: OnImageItemClickListener
@@ -54,8 +58,16 @@ class UriAdapter(private val dataSet: MutableList<Uri>) :
      * @param position 配列の位置
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        //fixme android 9以降で落ちる。8では問題ない。
-        holder.imageView!!.setImageURI(dataSet[position])
+        var uri = dataSet[position]
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            val contentResolver = context.contentResolver
+//            val takeFlags: Int =
+//                Intent(Intent.ACTION_OPEN_DOCUMENT).flags and Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            //fixme SecurityException
+            contentResolver.takePersistableUriPermission(uri, takeFlags)
+        }
+        holder.imageView!!.setImageURI(uri)
         holder.imageView!!.setOnClickListener {
             listener.OnItemClick(dataSet[position])
         }
@@ -93,7 +105,7 @@ class UriAdapter(private val dataSet: MutableList<Uri>) :
     /**
      * アイテムを削除する
      */
-    fun removeItem(position: Int) : MutableList<Uri>{
+    fun removeItem(position: Int): MutableList<Uri> {
         this.dataSet.removeAt(position)
         notifyDataSetChanged()
         return this.dataSet
