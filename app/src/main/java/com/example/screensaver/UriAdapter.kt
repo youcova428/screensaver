@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 
 class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Context) :
@@ -59,14 +60,14 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var uri = dataSet[position]
-        if (SDK_INT >= Build.VERSION_CODES.P) {
-            val contentResolver = context.contentResolver
-//            val takeFlags: Int =
-//                Intent(Intent.ACTION_OPEN_DOCUMENT).flags and Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            //fixme SecurityException
-            contentResolver.takePersistableUriPermission(uri, takeFlags)
-        }
+//        if (SDK_INT >= Build.VERSION_CODES.P) {
+//            val contentResolver = context.contentResolver
+////            val takeFlags: Int =
+////                Intent(Intent.ACTION_OPEN_DOCUMENT).flags and Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//            //fixme SecurityException
+//            contentResolver.takePersistableUriPermission(uri, takeFlags)
+//        }
         holder.imageView!!.setImageURI(uri)
         holder.imageView!!.setOnClickListener {
             listener.OnItemClick(dataSet[position])
