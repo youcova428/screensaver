@@ -59,16 +59,7 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
      * @param position 配列の位置
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var uri = dataSet[position]
-//        if (SDK_INT >= Build.VERSION_CODES.P) {
-//            val contentResolver = context.contentResolver
-////            val takeFlags: Int =
-////                Intent(Intent.ACTION_OPEN_DOCUMENT).flags and Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//            //fixme SecurityException
-//            contentResolver.takePersistableUriPermission(uri, takeFlags)
-//        }
-        holder.imageView!!.setImageURI(uri)
+        holder.imageView!!.setImageURI(dataSet[position])
         holder.imageView!!.setOnClickListener {
             listener.OnItemClick(dataSet[position])
         }

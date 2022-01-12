@@ -84,19 +84,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
 
         Log.d("tag", "onCreate")
-
+        //sharedPreferencesからUriを取得する。
         saveMutableList = getUriArray(URI_COLLECTION, sharedPreferences)
         if (!saveMutableList.isNullOrEmpty()) {
-//            itemAdapter = UriAdapter(imageListConvert(saveMutableList!!))
-            //fixme SecurityException で落ちる　ファイルを開ける権限がないっぽい？
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).also {
-//                    it.addCategory(Intent.CATEGORY_OPENABLE)
-//                    it.type = "*/*"
-//                }
-//                startForResult.launch(intent)
-//            }
             setUpRecyclerView(imageListConvert(saveMutableList!!))
         }
 
@@ -127,10 +117,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     private val multiActivityResultLauncher =
         //fixme おそらくこの辺りを修正していく。
-        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
+        registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uriList ->
             var permissionUriList : MutableList<Uri> = mutableListOf()
             if (uriList != null && uriList.size != 0) {
-                //アクセス権限を付与する。 //fixme ここで落ちる。
+                //アクセス権限を付与する。
                 for (uri in uriList){
                     contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     permissionUriList.add(uri)
@@ -197,11 +187,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
      *画像フォルダから複数枚写真を選択する
      */
     private fun multiSelectPhoto() {
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-//            flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//            putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-//        }
-        multiActivityResultLauncher.launch("image/*")
+        multiActivityResultLauncher.launch(arrayOf("image/*"))
     }
 
     private fun setUpRecyclerView(uriList: MutableList<Uri>) {
@@ -289,16 +275,4 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return uriList
     }
 
-    //SharedPreferencesから受け取ってここに受け取らせる。
-//    private val startForResult =
-//        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
-//            if (result?.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.let { uri: Uri ->
-////                    val takeFlags: Int = intent.flags and
-////                            (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//                    contentResolver.takePersistableUriPermission(uri, takeFlags)
-//                    sharedPreferences.edit().putString(OPEN_DOCUMENT_PERMISSION, uri.toString())
-//                }
-//            }
-//        }
 }
