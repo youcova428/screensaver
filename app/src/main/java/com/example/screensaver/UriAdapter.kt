@@ -26,6 +26,9 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
         fun OnItemClick(uri: Uri)
     }
 
+    /**
+     * アイテムロングクリックリスナーのインターフェース
+     */
     interface OnImageItemLongClickListener {
         fun OnItemLongClick(position: Int)
     }
@@ -82,6 +85,10 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
         this.listener = listener
     }
 
+    /**
+     * アダプターの各アイテムのクリックリスナー
+     * @param longClickListener
+     */
     fun setImageItemLongClickListener(longClickListener: OnImageItemLongClickListener) {
         this.longClickListener = longClickListener
     }

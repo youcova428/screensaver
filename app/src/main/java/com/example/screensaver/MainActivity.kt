@@ -5,15 +5,21 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.Switch
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.*
+import java.io.IOException
+
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
@@ -73,6 +79,49 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         dreamServiceButton.setOnClickListener {
             val intent = Intent(Settings.ACTION_DREAM_SETTINGS)
             startActivity(intent)
+        }
+
+        val httpButton = findViewById<Button>(R.id.http_start_button)
+        httpButton.setOnClickListener {
+            //GETメソッドを記載する fuelの場合
+//            val httpAsync = "https://collectionapi.metmuseum.org/public/collection/v1/objects".httpGet().response { request, response, result ->
+//                println(response)
+//                when (result){
+//                    is Result.Success -> {
+//                        val data = result.get()
+//                        println(data)
+//                    }
+//                    is Result.Failure -> {
+//                        val error = result.error
+//                        println(error)
+//                    }
+//                }
+//            }
+//            httpAsync.join()
+
+            //okHttp3を使った場合
+            val handler = Handler(Looper.getMainLooper())
+            val request = Request.Builder()
+                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects/7777").build()
+            val client = OkHttpClient()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val responseText: String? = response.body?.string()
+                    handler.post {
+                        println(responseText)
+                        val type = object : TypeToken<Art>(){}.type
+//                        val museumObjectIds : MuseumObjectIds = Gson().fromJson(responseText, type)
+                        val art : Art = Gson().fromJson(responseText, type)
+                        //Art, MuseumObjectIdsどちらもパースできることは確認済み
+                        println(art.primaryImage)
+                        println(art.objectId)
+//                        println(museumObjectIds.objectIds.last())
+                    }
+                }
+            })
         }
 
         saveMutableList = mPrefUtils!!.getUriArray(URI_COLLECTION)
