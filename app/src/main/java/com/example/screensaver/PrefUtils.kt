@@ -38,6 +38,10 @@ class PrefUtils {
         editor = preferences.edit()
     }
 
+    fun saveBoolean(key :String, boolean: Boolean ){
+        editor.putBoolean(key, boolean).apply()
+    }
+
     fun saveUriSet(key: String, uriSet: Set<Image>) {
         val json = Gson().toJson(uriSet)
         editor.putString(key, json).apply()

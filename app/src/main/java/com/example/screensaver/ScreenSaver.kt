@@ -8,6 +8,9 @@ import android.provider.ContactsContract.Intents.Insert.ACTION
 import android.service.dreams.DreamService
 import android.widget.ImageView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.screensaver.MainActivity.Companion.FULL_SCREEN
+import com.example.screensaver.MainActivity.Companion.INTERACTIVE
+import com.example.screensaver.MainActivity.Companion.SCREEN_BRIGHT
 import com.example.screensaver.MainActivity.Companion.image
 import java.io.IOException
 
@@ -23,6 +26,11 @@ class ScreenSaver : DreamService() {
         isScreenBright = false
         setContentView(R.layout.screen_saver)
         screenImage = findViewById(R.id.screen_picture)
+        val prefUtils = PrefUtils.with(applicationContext).apply {
+            saveBoolean(INTERACTIVE, isInteractive)
+            saveBoolean(FULL_SCREEN, isFullscreen)
+            saveBoolean(SCREEN_BRIGHT, isScreenBright)
+        }
     }
 
     override fun onDreamingStarted() {
@@ -30,7 +38,7 @@ class ScreenSaver : DreamService() {
         if(image != null) {
             screenImage!!.setImageBitmap(image)
         }else {
-            screenImage!!.setImageResource(R.drawable.pict_mvis)
+            screenImage!!.setImageResource(R.drawable.shiba_dog)
         }
     }
 

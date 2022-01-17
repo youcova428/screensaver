@@ -44,16 +44,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         mPrefUtils = PrefUtils.with(applicationContext)
 
         val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
-        switchInteractive.isChecked = mPrefUtils!!.getBoolean(INTERACTIVE, true)
+        switchInteractive.isChecked = mPrefUtils!!.getBoolean(INTERACTIVE, false)
+        Log.d("tag", switchInteractive.isChecked.toString())
         switchInteractive.setOnCheckedChangeListener { _, isChecked ->
             mPrefUtils!!.getEditor().apply() {
-                putBoolean("isInteractive", isChecked)
+                putBoolean(INTERACTIVE, isChecked)
                 apply()
             }
         }
 
         val switchFullscreen = findViewById<Switch>(R.id.switch_service_fullscreen)
         switchFullscreen.isChecked = mPrefUtils!!.getBoolean(FULL_SCREEN, true)
+        Log.d("tag", switchFullscreen.isChecked.toString())
         switchFullscreen.setOnCheckedChangeListener { _, isChecked ->
             mPrefUtils!!.getEditor().apply() {
                 putBoolean(FULL_SCREEN, isChecked)
@@ -62,7 +64,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
 
         val switchScreenBright = findViewById<Switch>(R.id.switch_service_screenbright)
-        switchFullscreen.isChecked = mPrefUtils!!.getBoolean(SCREEN_BRIGHT, true)
+        switchScreenBright.isChecked = mPrefUtils!!.getBoolean(SCREEN_BRIGHT, false)
+        Log.d("tag", switchScreenBright.isChecked.toString())
         switchScreenBright.setOnCheckedChangeListener { _, isChecked ->
             mPrefUtils!!.getEditor().apply() {
                 putBoolean(SCREEN_BRIGHT, isChecked)
@@ -123,12 +126,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 }
             })
         }
-
         saveMutableList = mPrefUtils!!.getUriArray(URI_COLLECTION)
         if (!saveMutableList.isNullOrEmpty()) {
             setUpRecyclerView(imageListConvert(saveMutableList!!))
         }
-
     }
 
     /**
@@ -197,6 +198,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         multiActivityResultLauncher.launch(arrayOf("image/*"))
     }
 
+    /**
+     *　RecyclerViewを設置する
+     * @param uriList
+     */
     private fun setUpRecyclerView(uriList: MutableList<Uri>) {
         itemAdapter = UriAdapter(uriList, applicationContext)
         with(recyclerView) {
@@ -215,7 +220,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 image = BitmapFactory.decodeStream(inputStream)
             }
         })
-
         //ItemLongClickListener実装
         itemAdapter.setImageItemLongClickListener(object : UriAdapter.OnImageItemLongClickListener {
             var removedUriList: MutableList<Uri> = mutableListOf()
@@ -227,6 +231,11 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         })
     }
 
+    /**
+     *　既存のuriリストと新たに取得したUriリストを足し合わせる
+     * @param exitingList : 既存のUriリスト
+     * @param uriList : 新たに取得したUriリスト
+     */
     private fun createAddUriList(
         exitingList: MutableList<Uri>,
         uriList: MutableList<Uri>
@@ -238,7 +247,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return addUriList
     }
 
-    //MutableList<Uri> -> MutableSet<Image> 変換メソッド
+    /**
+     * MutableList<Uri> -> MutableSet<Image> 変換メソッド
+     * @param list : Uriリスト
+     */
     private fun uriListConvert(list: MutableList<Uri>): MutableSet<Image> {
         val mutableSet = mutableSetOf<Image>()
         for (uri in list) {
@@ -248,7 +260,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         return mutableSet
     }
 
-    //MutableList<Image> -> MutableList<Uri> 変換メソッド
+    /**
+     * MutableList<Image> -> MutableList<Uri> 変換メソッド
+     * @param imageList : Imageリスト
+     */
     private fun imageListConvert(imageList: MutableList<Image>): MutableList<Uri> {
         val uriList = mutableListOf<Uri>()
         for (image in imageList) {
