@@ -2,7 +2,7 @@ package com.example.screensaver
 
 import com.google.gson.annotations.SerializedName
 
-class MuseumObjectIds {
+class MuseumObject {
 
     @SerializedName("total")
     val total : String = ""
