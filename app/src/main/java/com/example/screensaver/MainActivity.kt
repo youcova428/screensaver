@@ -121,7 +121,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                         //Art, MuseumObjectIdsどちらもパースできることは確認済み
                         println(museumObject.objectIds.last())
                         val intent = Intent(this@MainActivity, MuseumActivity::class.java)
-                        intent.putExtra("MuseumObjects", museumObject.objectIds as Serializable)
+                        intent.putStringArrayListExtra("MuseumObjectIDs", museumObject.objectIds)
                         startActivity(intent)
                     }
                 }
