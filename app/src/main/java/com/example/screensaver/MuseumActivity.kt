@@ -3,6 +3,7 @@ package com.example.screensaver
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.WorkerThread
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
@@ -25,28 +26,20 @@ class MuseumActivity : AppCompatActivity() {
 
         val artImageMutableList = mutableListOf<String>()
         var i = 0
-        for (id in objectList!!) {
-            artImageMutableList.add(getArtRequest(id).primaryImage)
-            Log.d("tag", artImageMutableList[i])
-            i += 1
-        }
-
-    }
-
-    fun getAsync(id: String, onFailed: (Exception) -> Unit = {}, onSuccess: (Art) -> Unit = {}) {
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                coroutineScope {
-                    async(Dispatchers.Main) { getArtRequest(id) }.await().let {
-                        onSuccess(it)
-                    }
+        runBlocking {
+            for (id in objectList!!) {
+                if (i > 30) {
+                    return@runBlocking
                 }
-            } catch (e: Exception) {
-                onFailed(e)
+                val urlImage = getAsyncArtRequest(id).primaryImage
+                if(urlImage.isNotEmpty()){
+                    artImageMutableList.add(urlImage)
+                    Log.d("tag", artImageMutableList[i])
+                    i += 1
+                }
             }
         }
     }
-
 
     private fun getArtRequest(id: String): Art {
         val request = Request.Builder()
@@ -60,4 +53,16 @@ class MuseumActivity : AppCompatActivity() {
             return Gson().fromJson(responseText, type)
         }
     }
+
+    @WorkerThread
+    private suspend fun getAsyncArtRequest(id: String): Art {
+        return withContext(Dispatchers.Default) {
+            val http = HttpUtil()
+            val response: String? =
+                http.httpGet("https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}")
+            val type = object : TypeToken<Art>() {}.type
+            Gson().fromJson(response, type)
+        }
+    }
+
 }

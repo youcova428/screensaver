@@ -106,7 +106,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             //okHttp3を使った場合
             val handler = Handler(Looper.getMainLooper())
             val request = Request.Builder()
-                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-01-18").build()
+                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-01-20").build()
             val client = OkHttpClient()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
