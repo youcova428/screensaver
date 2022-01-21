@@ -3,6 +3,7 @@ package com.example.screensaver
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.annotation.WorkerThread
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.result.Result
@@ -26,32 +27,22 @@ class MuseumActivity : AppCompatActivity() {
 
         val artImageMutableList = mutableListOf<String>()
         var i = 0
-        runBlocking {
-            for (id in objectList!!) {
-                if (i > 30) {
-                    return@runBlocking
-                }
-                val urlImage = getAsyncArtRequest(id).primaryImage
-                if(urlImage.isNotEmpty()){
-                    artImageMutableList.add(urlImage)
-                    Log.d("tag", artImageMutableList[i])
-                    i += 1
-                }
+        GlobalScope.launch(Dispatchers.Main) {
+                for (id in objectList!!) {
+                    if (i > 30) {
+                        break
+                    }
+                    val urlImage = getAsyncArtRequest(id).primaryImage
+                    if (urlImage.isNotEmpty()) {
+                        artImageMutableList.add(urlImage)
+                        Log.d("tag", artImageMutableList[i])
+                        i += 1
+                    }
             }
+            val artImageUrl = findViewById<TextView>(R.id.art_image_url)
+            artImageUrl.text = artImageMutableList[(1..30).random()]
         }
-    }
 
-    private fun getArtRequest(id: String): Art {
-        val request = Request.Builder()
-            .url("https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}").build()
-        OkHttpClient().newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw IOException("$response")
-            }
-            val responseText: String? = response.body.toString()
-            val type = object : TypeToken<Art>() {}.type
-            return Gson().fromJson(responseText, type)
-        }
     }
 
     @WorkerThread
