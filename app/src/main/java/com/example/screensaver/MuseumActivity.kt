@@ -3,6 +3,8 @@ package com.example.screensaver
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.WorkerThread
 import com.github.kittinunf.fuel.toolbox.HttpClient
@@ -16,6 +18,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.lang.Exception
 import java.lang.ref.ReferenceQueue
+import kotlin.math.max
 
 class MuseumActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,25 +27,27 @@ class MuseumActivity : AppCompatActivity() {
 
         val objectList =
             intent.getStringArrayListExtra("MuseumObjectIDs")
+        val artImageProgress = findViewById<ProgressBar>(R.id.art_image_progress)
+        var nowValue = artImageProgress.progress
+        artImageProgress.max = 100
+        val artImageMutableList = mutableListOf<Art>()
 
-        val artImageMutableList = mutableListOf<String>()
-        var i = 0
         GlobalScope.launch(Dispatchers.Main) {
                 for (id in objectList!!) {
-                    if (i > 30) {
+                    if (nowValue == artImageProgress.max) {
+                        artImageProgress.visibility = View.INVISIBLE
                         break
                     }
-                    val urlImage = getAsyncArtRequest(id).primaryImage
-                    if (urlImage.isNotEmpty()) {
-                        artImageMutableList.add(urlImage)
-                        Log.d("tag", artImageMutableList[i])
-                        i += 1
+                    val artObject = getAsyncArtRequest(id)
+                    if (artObject.primaryImage.isNotEmpty()) {
+                        artImageMutableList.add(artObject)
+                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
+                        nowValue += 1
                     }
             }
             val artImageUrl = findViewById<TextView>(R.id.art_image_url)
-            artImageUrl.text = artImageMutableList[(1..30).random()]
+            artImageUrl.text = artImageMutableList[(1..100).random()].primaryImage
         }
-
     }
 
     @WorkerThread
