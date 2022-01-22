@@ -5,20 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.WorkerThread
-import com.github.kittinunf.fuel.toolbox.HttpClient
-import com.github.kittinunf.result.Result
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
 import okhttp3.*
-import org.json.JSONObject
-import java.io.IOException
-import java.lang.Exception
-import java.lang.ref.ReferenceQueue
-import kotlin.math.max
 
 class MuseumActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,20 +27,19 @@ class MuseumActivity : AppCompatActivity() {
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) {
-                for (id in objectList!!) {
-                    if (nowValue == artImageProgress.max) {
-                        artImageProgress.visibility = View.INVISIBLE
-                        break
-                    }
-                    val artObject = getAsyncArtRequest(id)
-                    if (artObject.primaryImage.isNotEmpty()) {
-                        artImageMutableList.add(artObject)
-                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
-                        nowValue += 1
-                    }
+            for (id in objectList!!) {
+                if (nowValue == artImageProgress.max) {
+                    artImageProgress.visibility = View.INVISIBLE
+                    setUpRecyclerView(artImageMutableList)
+                    return@launch
+                }
+                val artObject = getAsyncArtRequest(id)
+                if (artObject.primaryImage.isNotEmpty()) {
+                    artImageMutableList.add(artObject)
+                    Log.d("tag", artImageMutableList[nowValue].primaryImage)
+                    nowValue += 1
+                }
             }
-            val artImageUrl = findViewById<TextView>(R.id.art_image_url)
-            artImageUrl.text = artImageMutableList[(1..100).random()].primaryImage
         }
     }
 
@@ -61,4 +54,21 @@ class MuseumActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpRecyclerView(artList: MutableList<Art>) {
+        val artAdapter = ArtAdapter(artList)
+        val recyclerview = findViewById<RecyclerView>(R.id.art_recyclerview)
+        with(recyclerview) {
+            adapter = artAdapter
+            layoutManager =
+                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
+                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                }
+        }
+        artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
+            override fun OnArtItemClick(art: Art) {
+                Toast.makeText(applicationContext, "${art.title}が入力された。", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        })
+    }
 }

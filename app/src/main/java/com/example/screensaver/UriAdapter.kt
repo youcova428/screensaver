@@ -18,7 +18,6 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
     private lateinit var listener: OnImageItemClickListener
     private lateinit var longClickListener: OnImageItemLongClickListener
 
-
     /**
      * アイテムクリックリスナーのインターフェース
      */
