@@ -19,10 +19,8 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var imageView: ImageView? = null
-        var titleText : TextView? = null
         init {
             imageView = view.findViewById(R.id.recyclerview_art_item_image)
-            titleText = view.findViewById(R.id.recyclerview_art_item_title)
         }
     }
 
@@ -38,7 +36,6 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
         holder.imageView!!.setOnClickListener {
             listener.OnArtItemClick(artList[position])
         }
-        holder.titleText!!.text = artList[position].title
     }
 
     override fun getItemCount(): Int {

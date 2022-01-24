@@ -87,23 +87,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
         val httpButton = findViewById<Button>(R.id.http_start_button)
         httpButton.setOnClickListener {
-            //GETメソッドを記載する fuelの場合
-//            val httpAsync = "https://collectionapi.metmuseum.org/public/collection/v1/objects".httpGet().response { request, response, result ->
-//                println(response)
-//                when (result){
-//                    is Result.Success -> {
-//                        val data = result.get()
-//                        println(data)
-//                    }
-//                    is Result.Failure -> {
-//                        val error = result.error
-//                        println(error)
-//                    }
-//                }
-//            }
-//            httpAsync.join()
-
-            //okHttp3を使った場合
             val handler = Handler(Looper.getMainLooper())
             val request = Request.Builder()
                 .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-01-20").build()
@@ -207,7 +190,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         itemAdapter = UriAdapter(uriList, applicationContext)
         with(recyclerView) {
             adapter = itemAdapter
-            //fixme layout修正　とりあえずStaggeredGridLayoutを実装した感じ　もっときれいにしたい
             layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
                     gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE

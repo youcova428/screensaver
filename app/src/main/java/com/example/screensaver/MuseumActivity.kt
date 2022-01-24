@@ -23,7 +23,7 @@ class MuseumActivity : AppCompatActivity() {
             intent.getStringArrayListExtra("MuseumObjectIDs")
         val artImageProgress = findViewById<ProgressBar>(R.id.art_image_progress)
         var nowValue = artImageProgress.progress
-        artImageProgress.max = 40
+        artImageProgress.max = 100
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) {
