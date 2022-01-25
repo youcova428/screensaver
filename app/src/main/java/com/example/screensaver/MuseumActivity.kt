@@ -66,8 +66,11 @@ class MuseumActivity : AppCompatActivity() {
         }
         artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
             override fun OnArtItemClick(art: Art) {
-                Toast.makeText(applicationContext, "${art.title}が入力された。", Toast.LENGTH_SHORT)
+                Toast.makeText(applicationContext, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.add(R.id.fragment_container, ArtDetailFragment.newInstance(art.objectId))
+                transaction.commit()
             }
         })
     }
