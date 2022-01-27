@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@layout/fragment_art_list">
+
+    <fragment
+        android:id="@+id/art_list_fragment"
+        android:name="com.example.screensaver.ArtListFragment"
+        android:label="art_list_fragment"
+        tools:layout="@layout/fragment_art_list">
+        <action
+            android:id="@+id/action_art_list_to_detail_fragment"
+            app:destination="@id/art_detail_fragment">
+            <argument
+                android:name="artObjectId"
+                app:argType="string"
+                android:defaultValue=""/>
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/art_detail_fragment"
+        android:name="com.example.screensaver.ArtDetailFragment"
+        android:label="art_detail_fragment"
+        tools:layout="@layout/fragment_art_detail"/>
+
+</navigation>

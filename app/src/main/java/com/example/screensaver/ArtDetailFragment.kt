@@ -24,15 +24,15 @@ class ArtDetailFragment : Fragment() {
 
     private var mImageView: ImageView? = null
 
-    companion object {
-        fun newInstance(id: String): ArtDetailFragment {
-            val fragment = ArtDetailFragment()
-            val bundle = Bundle()
-            bundle.putString("ArtID", id)
-            fragment.arguments = bundle
-            return fragment
-        }
-    }
+//    companion object {
+//        fun newInstance(id: String): ArtDetailFragment {
+//            val fragment = ArtDetailFragment()
+//            val bundle = Bundle()
+//            bundle.putString("ArtID", id)
+//            fragment.arguments = bundle
+//            return fragment
+//        }
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
