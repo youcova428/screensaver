@@ -14,7 +14,7 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
     private lateinit var listener: OnArtItemClickListener
 
     interface OnArtItemClickListener {
-        fun OnArtItemClick(art: Art)
+        fun OnArtItemClick(art: Art , view: View)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -34,7 +34,7 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
         Glide.with(holder.imageView!!.context).load(artList[position].primaryImage)
             .into(holder.imageView!!)
         holder.imageView!!.setOnClickListener {
-            listener.OnArtItemClick(artList[position])
+            listener.OnArtItemClick(artList[position], it)
         }
     }
 

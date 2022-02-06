@@ -8,7 +8,10 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.bundleOf
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
@@ -17,73 +20,47 @@ import kotlinx.coroutines.*
 import okhttp3.*
 
 class MuseumActivity : AppCompatActivity() {
+
+    private var mObjectList: ArrayList<String>? = null
+    private var mArgs: Bundle? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_museum)
 
-        val objectList =
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().add(
+                R.id.nav_fragment_container,
+                ArtListFragment(),
+                null,
+            ).commit()
+        }
+
+        mObjectList =
             intent.getStringArrayListExtra("MuseumObjectIDs")
 
         val firstFragment = ArtListFragment()
-        val args = Bundle().apply {
-            putStringArrayList("MuseumObjectIDs", objectList)
+        mArgs = Bundle().apply {
+            putStringArrayList("MuseumObjectIDs", mObjectList)
         }
-        firstFragment.arguments = args
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_fragment_container, firstFragment)
-            .commit()
 
-//        val artImageProgress = findViewById<ProgressBar>(R.id.art_image_progress)
-//        var nowValue = artImageProgress.progress
-//        artImageProgress.max = 100
-//        val artImageMutableList = mutableListOf<Art>()
-//
-//        GlobalScope.launch(Dispatchers.Main) {
-//            for (id in objectList!!) {
-//                if (nowValue == artImageProgress.max) {
-//                    artImageProgress.visibility = View.INVISIBLE
-//                    setUpRecyclerView(artImageMutableList)
-//                    return@launch
-//                }
-//                val artObject = getAsyncArtRequest(id)
-//                if (artObject.primaryImage.isNotEmpty()) {
-//                    artImageMutableList.add(artObject)
-//                    Log.d("tag", artImageMutableList[nowValue].primaryImage)
-//                    nowValue += 1
-//                }
-//            }
-//        }
+
+        findNavController(R.id.nav_fragment_container)
+            .setGraph(R.navigation.navigation_graph, mArgs)
     }
 
-//    @WorkerThread
-//    private suspend fun getAsyncArtRequest(id: String): Art {
-//        return withContext(Dispatchers.Default) {
-//            val http = HttpUtil()
-//            val response: String? =
-//                http.httpGet("https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}")
-//            val type = object : TypeToken<Art>() {}.type
-//            Gson().fromJson(response, type)
-//        }
-//    }
-//
-//    private fun setUpRecyclerView(artList: MutableList<Art>) {
-//        val artAdapter = ArtAdapter(artList)
-//        val recyclerview = findViewById<RecyclerView>(R.id.art_recyclerview)
-//        with(recyclerview) {
-//            adapter = artAdapter
-//            layoutManager =
-//                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
-//                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
-//                }
-//        }
-//        artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
-//            override fun OnArtItemClick(art: Art) {
-//                Toast.makeText(applicationContext, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
-//                    .show()
-////                val transaction = supportFragmentManager.beginTransaction()
-////                transaction.add(R.id.fragment_container, ArtDetailFragment.newInstance(art.objectId))
-////                transaction.commit()
-//            }
-//        })
-//    }
+    override fun onStart() {
+        super.onStart()
+    }
+
+    fun navigateToArtDetail( artId : String) {
+        val fragment = ArtDetailFragment()
+        val args = Bundle().apply {
+            putString("ArtId", artId)
+        }
+        fragment.arguments = args
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.nav_fragment_container , fragment , null)
+            .commit()
+    }
 }

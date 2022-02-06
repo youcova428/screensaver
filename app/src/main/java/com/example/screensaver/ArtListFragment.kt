@@ -1,5 +1,6 @@
 package com.example.screensaver
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,8 +10,11 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.WorkerThread
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -22,6 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ArtListFragment : Fragment() {
+
+    var mView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +43,12 @@ class ArtListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        mView = view
         val objectList =
             arguments?.getStringArrayList("MuseumObjectIDs")
-        val artImageProgress = view!!.findViewById<ProgressBar>(R.id.art_image_progress)
+        val artImageProgress = mView!!.findViewById<ProgressBar>(R.id.art_image_progress)
         var nowValue = artImageProgress.progress
-        artImageProgress.max = 100
+        artImageProgress.max = 30
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -76,25 +82,32 @@ class ArtListFragment : Fragment() {
 
     private fun setUpRecyclerView(artList: MutableList<Art>) {
         val artAdapter = ArtAdapter(artList)
-        val recyclerview = view!!.findViewById<RecyclerView>(R.id.art_recyclerview)
+        val recyclerview = mView!!.findViewById<RecyclerView>(R.id.art_recyclerview)
         with(recyclerview) {
             adapter = artAdapter
             layoutManager =
-                StaggeredGridLayoutManager(2, androidx.recyclerview.widget.StaggeredGridLayoutManager.VERTICAL).apply {
-                    gapStrategy = androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                StaggeredGridLayoutManager(
+                    2,
+                    androidx.recyclerview.widget.StaggeredGridLayoutManager.VERTICAL
+                ).apply {
+                    gapStrategy =
+                        androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
                 }
         }
         artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
-            override fun OnArtItemClick(art: Art) {
-                Toast.makeText(view!!.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
+            override fun OnArtItemClick(art: Art, view: View) {
+                Toast.makeText(mView!!.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
-//                val transaction = supportFragmentManager.beginTransaction()
-//                transaction.add(R.id.fragment_container, ArtDetailFragment.newInstance(art.objectId))
-//                transaction.commit()
-
                 //ArtDetailFragmentへの遷移
+                val navHostFragment =
+                    requireActivity().supportFragmentManager.findFragmentById(R.id.nav_fragment_container) as NavHostFragment
+                val navController = navHostFragment.navController
                 val action = ArtListFragmentDirections.actionArtListToDetailFragment(art.objectId)
-                findNavController().navigate(action)
+                navController.navigate(action)
+//                Navigation.findNavController(it).navigate(R.id.action_art_list_to_detail_fragment)
+//                Navigation.findNavController(,R.id.nav_fragment_container).navigate(R.id.art_detail_fragment)
+//                view.findNavController().navigate(R.id.art_detail_fragment)
+//                Navigation.findNavController(view).navigate(action)
             }
         })
     }
