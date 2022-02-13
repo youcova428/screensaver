@@ -24,6 +24,11 @@
         android:id="@+id/art_detail_fragment"
         android:name="com.example.screensaver.ArtDetailFragment"
         android:label="art_detail_fragment"
-        tools:layout="@layout/fragment_art_detail"/>
+        tools:layout="@layout/fragment_art_detail" >
+        <argument
+            android:name="artObjectId"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 
 </navigation>

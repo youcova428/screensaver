@@ -27,11 +27,7 @@ import kotlinx.coroutines.withContext
 
 class ArtListFragment : Fragment() {
 
-    var mView: View? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    lateinit var mView: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,21 +44,24 @@ class ArtListFragment : Fragment() {
             arguments?.getStringArrayList("MuseumObjectIDs")
         val artImageProgress = mView!!.findViewById<ProgressBar>(R.id.art_image_progress)
         var nowValue = artImageProgress.progress
-        artImageProgress.max = 30
+        artImageProgress.max = 5
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) {
-            for (id in objectList!!) {
-                if (nowValue == artImageProgress.max) {
-                    artImageProgress.visibility = View.INVISIBLE
-                    setUpRecyclerView(artImageMutableList)
-                    return@launch
-                }
-                val artObject = getAsyncArtRequest(id)
-                if (artObject.primaryImage.isNotEmpty()) {
-                    artImageMutableList.add(artObject)
-                    Log.d("tag", artImageMutableList[nowValue].primaryImage)
-                    nowValue += 1
+            if (objectList != null) {
+                for (id in objectList) {
+                    if (nowValue == artImageProgress.max) {
+                        //todo progressbarが消えない問題発生。
+                        artImageProgress.visibility = View.INVISIBLE
+                        setUpRecyclerView(artImageMutableList)
+                        return@launch
+                    }
+                    val artObject = getAsyncArtRequest(id)
+                    if (artObject.primaryImage.isNotEmpty()) {
+                        artImageMutableList.add(artObject)
+                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
+                        nowValue += 1
+                    }
                 }
             }
         }
@@ -99,15 +98,7 @@ class ArtListFragment : Fragment() {
                 Toast.makeText(mView!!.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
                 //ArtDetailFragmentへの遷移
-                val navHostFragment =
-                    requireActivity().supportFragmentManager.findFragmentById(R.id.nav_fragment_container) as NavHostFragment
-                val navController = navHostFragment.navController
-                val action = ArtListFragmentDirections.actionArtListToDetailFragment(art.objectId)
-                navController.navigate(action)
-//                Navigation.findNavController(it).navigate(R.id.action_art_list_to_detail_fragment)
-//                Navigation.findNavController(,R.id.nav_fragment_container).navigate(R.id.art_detail_fragment)
-//                view.findNavController().navigate(R.id.art_detail_fragment)
-//                Navigation.findNavController(view).navigate(action)
+                (requireActivity() as MuseumActivity).navigateToArtDetail(art.objectId)
             }
         })
     }

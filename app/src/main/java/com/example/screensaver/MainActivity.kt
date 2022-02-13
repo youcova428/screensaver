@@ -1,6 +1,5 @@
 package com.example.screensaver
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,22 +8,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import android.service.controls.ControlsProviderService.TAG
 import android.util.Log
 import android.widget.Button
 import android.widget.Switch
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.helper.widget.MotionEffect.TAG
 import androidx.fragment.app.FragmentActivity
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
-import java.io.Serializable
 
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
@@ -94,11 +88,12 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         httpButton.setOnClickListener {
             val handler = Handler(Looper.getMainLooper())
             val request = Request.Builder()
-                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-01-20")
+                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-02-10")
                 .build()
             val client = OkHttpClient()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
+                    Log.d("tag", "{$e}: request 失敗")
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -112,15 +107,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                         val intent = Intent(this@MainActivity, MuseumActivity::class.java)
                         intent.putStringArrayListExtra("MuseumObjectIDs", museumObject.objectIds)
                         startActivity(intent)
-
-//
-//                      d(R.id.nav_fragment_container) as NavHostFragment
-//                        val navController = navHostFragment.navController
-//                        NavHostFragment.create(R.navigation.navigation_graph, intent.extras)
-//                        findNavController(R.id.).setGraph(R.navigation.navigation_graph, intent.extras)
-//                        navController.navigateUp()
-//                        NavHostFragment.findNavController(navHostFragment).navigate(R.id.art_list_fragment)
-//                        navController.navigate(R.id.art_list_fragment)
                     }
                 }
             })

@@ -24,20 +24,6 @@ class ArtDetailFragment : Fragment() {
 
     private var mImageView: ImageView? = null
 
-//    companion object {
-//        fun newInstance(id: String): ArtDetailFragment {
-//            val fragment = ArtDetailFragment()
-//            val bundle = Bundle()
-//            bundle.putString("ArtID", id)
-//            fragment.arguments = bundle
-//            return fragment
-//        }
-//    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,7 +35,8 @@ class ArtDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mImageView = view.findViewById(R.id.art_detail_image)
-        val id = arguments?.getString("ArtID")
+        //ArtListFragmentからid受け取り
+        val id = arguments?.get("ArtId")
 
         val handler = Handler(Looper.getMainLooper())
         val request = Request.Builder()
