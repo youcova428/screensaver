@@ -42,6 +42,7 @@ class MuseumActivity : AppCompatActivity() {
         }
         fragment.arguments = args
         supportFragmentManager.beginTransaction()
+            .addToBackStack(null)
             .replace(R.id.nav_fragment_container, fragment, null)
             .commit()
     }
