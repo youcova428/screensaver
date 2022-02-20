@@ -1,7 +1,5 @@
 package com.example.screensaver
 
-import android.app.DownloadManager
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -23,6 +22,7 @@ import java.io.IOException
 class ArtDetailFragment : Fragment() {
 
     private var mImageView: ImageView? = null
+    private var mDownloadButton: Button? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +35,8 @@ class ArtDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mImageView = view.findViewById(R.id.art_detail_image)
+        mDownloadButton = view.findViewById(R.id.art_detail_download_button)
+
         //ArtListFragmentからid受け取り
         val id = arguments?.get("ArtId")
 
@@ -56,5 +58,11 @@ class ArtDetailFragment : Fragment() {
                 }
             }
         })
+
+        mDownloadButton!!.setOnClickListener {
+            //todo ダウンロードメソッドを追加する
+
+        }
     }
+
 }

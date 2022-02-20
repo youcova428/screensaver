@@ -2,13 +2,13 @@ package com.example.screensaver
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.WorkerThread
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
@@ -35,7 +35,7 @@ class ArtListFragment : Fragment() {
         mView = view
         val objectList =
             arguments?.getStringArrayList("MuseumObjectIDs")
-        val artImageProgress = mView!!.findViewById<ProgressBar>(R.id.art_image_progress)
+        val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         var nowValue = artImageProgress.progress
         artImageProgress.max = 5
         val artImageMutableList = mutableListOf<Art>()
@@ -74,7 +74,7 @@ class ArtListFragment : Fragment() {
 
     private fun setUpRecyclerView(artList: MutableList<Art>) {
         val artAdapter = ArtAdapter(artList)
-        val recyclerview = mView!!.findViewById<RecyclerView>(R.id.art_recyclerview)
+        val recyclerview = mView.findViewById<RecyclerView>(R.id.art_recyclerview)
         with(recyclerview) {
             adapter = artAdapter
             layoutManager =
