@@ -7,16 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class ArtListFragment : Fragment() {
 
@@ -40,11 +38,11 @@ class ArtListFragment : Fragment() {
         artImageProgress.max = 5
         val artImageMutableList = mutableListOf<Art>()
 
-        GlobalScope.launch(Dispatchers.Main) {
+        GlobalScope.launch(Dispatchers.Main) launch@ {
             if (objectList != null) {
                 for (id in objectList) {
                     if (nowValue == artImageProgress.max) {
-                        //todo progressbarが消えない問題発生。
+                        //fixme progressbar disappears
                         artImageProgress.visibility = View.INVISIBLE
                         setUpRecyclerView(artImageMutableList)
                         return@launch
@@ -59,7 +57,6 @@ class ArtListFragment : Fragment() {
             }
         }
     }
-
 
     @WorkerThread
     private suspend fun getAsyncArtRequest(id: String): Art {
