@@ -35,7 +35,7 @@ class ArtListFragment : Fragment() {
             arguments?.getStringArrayList("MuseumObjectIDs")
         val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         var nowValue = artImageProgress.progress
-        artImageProgress.max = 5
+        artImageProgress.max = 10
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) launch@ {

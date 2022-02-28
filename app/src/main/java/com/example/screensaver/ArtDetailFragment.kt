@@ -1,18 +1,21 @@
 package com.example.screensaver
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Looper
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.*
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -76,51 +79,44 @@ class ArtDetailFragment : Fragment() {
 
         mDownloadButton!!.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
-                downloadArtImage(view.context, mArtDetail!!.primaryImage)
+                downloadArtImage(view.context, mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
 
         }
     }
 
-    //todo ダウンロードbitmapファイルを内部ストレージ保存できたっぽいけど、中身自体を確認できない。
-    private suspend fun downloadArtImage(context: Context, artUri: String) {
-//        val bitmap = Glide.with(context).asBitmap().load(artUri).submit().get()
-//        val directory = ContextWrapper(context).getDir(
-//            "image",
-//            Context.MODE_PRIVATE
-//        )
-//        val file = File(directory, "file_name")
-//        FileOutputStream(file).use { stream ->
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-//        }
-        val url = URL(artUri)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.allowUserInteraction = false
-        connection.requestMethod = "GET"
-        connection.connect()
+    private fun downloadArtImage(context: Context, artUri: String, title: String) {
+        val imageBitmap = bitmapInitial(title, artUri)
+        val outStream = FileOutputStream(File(context.filesDir, "DownloadFile"))
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream)
+        outStream.close()
 
-        val statusCode = connection.responseCode
-        if (statusCode != HttpURLConnection.HTTP_OK) {
-            throw Exception("HTTP Status {$statusCode}")
+        // todo download path what ?
+        DocumentFile.fromTreeUri(context, Uri.parse(artUri))?.apply {
+            findFile("Download")?.listFiles()?.forEach {
+
+            }
         }
-        Log.d("tag", "Content-Type:{$statusCode}")
+        Toast.makeText(context, "{$title}を押下した。", Toast.LENGTH_SHORT).show()
+    }
 
-        val dataInStream = DataInputStream(connection.inputStream)
-        val dataOutputStream = DataOutputStream(
-            BufferedOutputStream(
-                // todo downloadファイルのpathがわからない
-                FileOutputStream("/storage/emulated/0/Download")
-            )
-        )
-        val buffer = ByteArray(4096)
-        var readByte : Int = 0
-
-        readByte = dataInStream.read(buffer)
-        while ( readByte != -1 ) {
-            dataOutputStream.write(buffer,0,readByte)
+    private fun bitmapInitial(name: String, artUri: String): Bitmap {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, name)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
         }
-        dataInStream.close()
-        dataOutputStream.close()
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val contentResolver = context?.contentResolver
+        val item = contentResolver?.insert(collection, values)!!
+
+        // Bitmap 初期化
+        var bitmap: Bitmap? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val source = ImageDecoder.createSource(contentResolver, Uri.parse(artUri))
+            //fixme FileNotFoundException
+            bitmap = ImageDecoder.decodeBitmap(source)
+        }
+        return bitmap!!
     }
 
 }

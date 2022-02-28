@@ -84,11 +84,12 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             startActivity(intent)
         }
 
+        //todo 検索方法の設定
         val httpButton = findViewById<Button>(R.id.http_start_button)
         httpButton.setOnClickListener {
             val handler = Handler(Looper.getMainLooper())
             val request = Request.Builder()
-                .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=2022-02-10")
+                .url("https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=man")
                 .build()
             val client = OkHttpClient()
             client.newCall(request).enqueue(object : Callback {
