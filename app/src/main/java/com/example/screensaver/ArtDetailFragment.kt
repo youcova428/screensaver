@@ -3,7 +3,9 @@ package com.example.screensaver
 import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.*
@@ -15,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -30,6 +33,7 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.time.LocalTime
 
 
 /**
@@ -79,24 +83,39 @@ class ArtDetailFragment : Fragment() {
 
         mDownloadButton!!.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
-                downloadArtImage(view.context, mArtDetail!!.primaryImage, mArtDetail!!.title)
+                downloadArtImage(requireContext(), mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
 
         }
     }
 
     private fun downloadArtImage(context: Context, artUri: String, title: String) {
-        val imageBitmap = bitmapInitial(title, artUri)
-        val outStream = FileOutputStream(File(context.filesDir, "DownloadFile"))
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream)
-        outStream.close()
-
-        // todo download path what ?
-        DocumentFile.fromTreeUri(context, Uri.parse(artUri))?.apply {
-            findFile("Download")?.listFiles()?.forEach {
-
+        val imageBitmap = BitmapFactory.decodeFile(artUri)
+        val fileName = "{$title.jpg}"
+        val mimeType = "image/jpeg"
+        val directory = Environment.DIRECTORY_PICTURES
+        val mediaContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        var imageOutStream: OutputStream?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+                put(MediaStore.Images.Media.RELATIVE_PATH, directory)
             }
+
+            val cr = context.contentResolver
+            cr.run {
+                val uri = cr?.insert(mediaContentUri, values)
+                imageOutStream = openOutputStream(uri!!)
+            }
+        } else {
+            val imagePath = Environment.getExternalStoragePublicDirectory(directory).absolutePath
+            val image = File(imagePath, fileName)
+            imageOutStream = FileOutputStream(image)
         }
+
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
+
         Toast.makeText(context, "{$title}を押下した。", Toast.LENGTH_SHORT).show()
     }
 
