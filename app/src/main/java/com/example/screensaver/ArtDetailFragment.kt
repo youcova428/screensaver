@@ -2,38 +2,29 @@ package com.example.screensaver
 
 import android.content.ContentValues
 import android.content.Context
-import android.content.ContextWrapper
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
 import java.io.*
-import java.net.HttpURLConnection
-import java.net.URI
 import java.net.URL
-import java.time.LocalTime
 
 
 /**
@@ -90,52 +81,46 @@ class ArtDetailFragment : Fragment() {
     }
 
     private fun downloadArtImage(context: Context, artUri: String, title: String) {
-        val imageBitmap = BitmapFactory.decodeFile(artUri)
+        val connection = URL(artUri).openConnection()
+        connection.doInput = true
+        connection.connectTimeout = 5000
+        connection.readTimeout = 30000
+        connection.useCaches = true
+        val imageInputStream : InputStream = connection.getInputStream()
+
+        var imageBitmap: Bitmap?
         val fileName = "{$title.jpg}"
         val mimeType = "image/jpeg"
         val directory = Environment.DIRECTORY_PICTURES
         val mediaContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         var imageOutStream: OutputStream?
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(MediaStore.Images.Media.MIME_TYPE, mimeType)
                 put(MediaStore.Images.Media.RELATIVE_PATH, directory)
+                put(MediaStore.MediaColumns.RELATIVE_PATH , "DCIM/" + "MetropolitanMuseum ")
             }
-
             val cr = context.contentResolver
             cr.run {
                 val uri = cr?.insert(mediaContentUri, values)
                 imageOutStream = openOutputStream(uri!!)
             }
+            imageBitmap = BitmapFactory.decodeStream(imageInputStream)
+            imageInputStream!!.close()
+
         } else {
             val imagePath = Environment.getExternalStoragePublicDirectory(directory).absolutePath
             val image = File(imagePath, fileName)
             imageOutStream = FileOutputStream(image)
+            imageBitmap =  MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(artUri))
         }
 
-        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
+        imageBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
+        imageOutStream!!.flush()
+        imageOutStream!!.close()
 
-        Toast.makeText(context, "{$title}を押下した。", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(context, "{$title}を押下した。", Toast.LENGTH_SHORT).show()
     }
-
-    private fun bitmapInitial(name: String, artUri: String): Bitmap {
-        val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, name)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-        }
-        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        val contentResolver = context?.contentResolver
-        val item = contentResolver?.insert(collection, values)!!
-
-        // Bitmap 初期化
-        var bitmap: Bitmap? = null
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val source = ImageDecoder.createSource(contentResolver, Uri.parse(artUri))
-            //fixme FileNotFoundException
-            bitmap = ImageDecoder.decodeBitmap(source)
-        }
-        return bitmap!!
-    }
-
 }
