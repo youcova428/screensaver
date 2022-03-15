@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
@@ -88,7 +87,7 @@ class ArtDetailFragment : Fragment() {
         connection.useCaches = true
         val imageInputStream : InputStream = connection.getInputStream()
 
-        var imageBitmap: Bitmap?
+        val imageBitmap: Bitmap
         val fileName = "{$title.jpg}"
         val mimeType = "image/jpeg"
         val directory = Environment.DIRECTORY_PICTURES
@@ -108,7 +107,7 @@ class ArtDetailFragment : Fragment() {
                 imageOutStream = openOutputStream(uri!!)
             }
             imageBitmap = BitmapFactory.decodeStream(imageInputStream)
-            imageInputStream!!.close()
+            imageInputStream.close()
 
         } else {
             val imagePath = Environment.getExternalStoragePublicDirectory(directory).absolutePath
@@ -117,7 +116,7 @@ class ArtDetailFragment : Fragment() {
             imageBitmap =  MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(artUri))
         }
 
-        imageBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
         imageOutStream!!.flush()
         imageOutStream!!.close()
 

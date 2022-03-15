@@ -6,14 +6,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ArtListFragment">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/art_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/art_recyclerview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:popupTheme="@style/Theme.AppCompat.Light"
+                app:title="museum_name"/>
+
+            <com.ferfalk.simplesearchview.SimpleSearchView
+                android:id="@+id/art_simple_search_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:type="card"
+                android:visibility="visible"/>
+
+        </FrameLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/art_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/art_search_bar" />
 
     <ProgressBar
         android:id="@+id/art_image_progress"

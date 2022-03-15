@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ScreenSaver</string>
+    <string name="museum_name">メトロポリタン美術館</string>
     <string name="art_detail_download">ダウンロード</string>
 </resources>

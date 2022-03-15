@@ -7,18 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.ferfalk.simplesearchview.SimpleSearchView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ArtListFragment : Fragment() {
 
     lateinit var mView: View
+    var mSearchBarFlag : Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +37,50 @@ class ArtListFragment : Fragment() {
         mView = view
         val objectList =
             arguments?.getStringArrayList("MuseumObjectIDs")
+
         val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
+        val artSearchView = view.findViewById<SimpleSearchView>(R.id.art_simple_search_view)
+//        artSearchView.showSearch()
+
+        artSearchView.setOnClickListener {
+            if (mSearchBarFlag) artSearchView.closeSearch() else artSearchView.showSearch()
+        }
+
+        // 検索バーの設置　
+        artSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextCleared(): Boolean {
+                return false
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+        })
+
+        artSearchView.setOnSearchViewListener(object : SimpleSearchView.SearchViewListener {
+            override fun onSearchViewClosed() {
+                mSearchBarFlag = false
+                Log.d("SimpleSearchView", "onSearchViewShown")
+            }
+
+            override fun onSearchViewClosedAnimation() {
+                Log.d("SimpleSearchView", "onSearchViewClosedAnimation")
+            }
+
+            override fun onSearchViewShown() {
+                mSearchBarFlag = true
+                Log.d("SimpleSearchView", "onSearchViewShown")
+            }
+
+            override fun onSearchViewShownAnimation() {
+                Log.d("SimpleSearchView", "onSearchViewShownAnimation")
+            }
+        })
+
         var nowValue = artImageProgress.progress
         artImageProgress.max = 10
         val artImageMutableList = mutableListOf<Art>()
@@ -94,3 +141,5 @@ class ArtListFragment : Fragment() {
     }
 
 }
+
+
