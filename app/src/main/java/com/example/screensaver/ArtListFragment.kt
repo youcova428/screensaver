@@ -19,7 +19,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ArtListFragment : Fragment() {
+class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
 
     lateinit var mView: View
     var mSearchBarFlag : Boolean = false
@@ -40,7 +40,12 @@ class ArtListFragment : Fragment() {
 
         val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         val artSearchView = view.findViewById<SimpleSearchView>(R.id.art_simple_search_view)
-//        artSearchView.showSearch()
+
+
+        artSearchView.addOnLayoutChangeListener {
+                v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            artSearchView.showSearch()
+        }
 
         artSearchView.setOnClickListener {
             if (mSearchBarFlag) artSearchView.closeSearch() else artSearchView.showSearch()
@@ -58,26 +63,6 @@ class ArtListFragment : Fragment() {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
-            }
-        })
-
-        artSearchView.setOnSearchViewListener(object : SimpleSearchView.SearchViewListener {
-            override fun onSearchViewClosed() {
-                mSearchBarFlag = false
-                Log.d("SimpleSearchView", "onSearchViewShown")
-            }
-
-            override fun onSearchViewClosedAnimation() {
-                Log.d("SimpleSearchView", "onSearchViewClosedAnimation")
-            }
-
-            override fun onSearchViewShown() {
-                mSearchBarFlag = true
-                Log.d("SimpleSearchView", "onSearchViewShown")
-            }
-
-            override fun onSearchViewShownAnimation() {
-                Log.d("SimpleSearchView", "onSearchViewShownAnimation")
             }
         })
 
@@ -140,6 +125,24 @@ class ArtListFragment : Fragment() {
         })
     }
 
+    override fun onSearchViewClosed() {
+        mSearchBarFlag = false
+        Log.d("SimpleSearchView", "onSearchViewShown")
+    }
+
+    override fun onSearchViewClosedAnimation() {
+        Log.d("SimpleSearchView", "onSearchViewClosedAnimation")
+    }
+
+    override fun onSearchViewShown() {
+        mSearchBarFlag = true
+        Log.d("SimpleSearchView", "onSearchViewShown")
+    }
+
+    override fun onSearchViewShownAnimation() {
+        Log.d("SimpleSearchView", "onSearchViewShownAnimation")
+    }
+    
 }
 
 
