@@ -1,12 +1,15 @@
 package com.example.screensaver
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.*
+import java.io.IOException
 
 class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
 
@@ -40,14 +45,14 @@ class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
 
         val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         val artSearchView = view.findViewById<SimpleSearchView>(R.id.art_simple_search_view)
+        val toolbar = view.findViewById<Toolbar>(R.id.art_list_toolbar)
 
-
-        artSearchView.addOnLayoutChangeListener {
-                v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+        artSearchView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             artSearchView.showSearch()
         }
 
-        artSearchView.setOnClickListener {
+        // 検索バーの表示・非表示
+        toolbar.setOnClickListener {
             if (mSearchBarFlag) artSearchView.closeSearch() else artSearchView.showSearch()
         }
 
@@ -61,7 +66,32 @@ class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
                 return false
             }
 
+            // Enter押下時？？　検索時の動作を書けば良き？？
             override fun onQueryTextSubmit(query: String?): Boolean {
+                // 番号取得までやると　→　リスト再度表示
+                // fixme response null
+                val url = "https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q={$query}"
+
+                val handler = Handler(Looper.getMainLooper())
+                val request = Request.Builder()
+                    .url(url)
+                    .build()
+                val client = OkHttpClient()
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        Log.d("tag", "{$e}: request 失敗")
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        val responseText: String? = response.body?.string()
+                        handler.post {
+                            println(responseText)
+                            val type = object : TypeToken<MuseumObject>() {}.type
+                            val museumObject: MuseumObject = Gson().fromJson(responseText, type)
+                            println(museumObject.objectIds.last())
+                        }
+                    }
+                })
                 return false
             }
         })

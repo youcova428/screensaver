@@ -20,10 +20,11 @@
             android:layout_height="wrap_content">
 
             <Toolbar
+                android:id="@+id/art_list_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:popupTheme="@style/Theme.AppCompat.Light"
-                app:title="museum_name"/>
+                app:title="@string/museum_name"/>
 
             <com.ferfalk.simplesearchview.SimpleSearchView
                 android:id="@+id/art_simple_search_view"
