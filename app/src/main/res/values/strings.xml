@@ -2,4 +2,9 @@
     <string name="app_name">ScreenSaver</string>
     <string name="museum_name">メトロポリタン美術館</string>
     <string name="art_detail_download">ダウンロード</string>
+
+    // 検索ワード
+    <string name="search_word_Europe">Europe</string>
+    <string name="search_word_France">France</string>
+    <string name="search_word_Italy">Italy</string>
 </resources>
