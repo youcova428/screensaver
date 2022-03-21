@@ -7,4 +7,12 @@
     <string name="search_word_Europe">Europe</string>
     <string name="search_word_France">France</string>
     <string name="search_word_Italy">Italy</string>
+    <string name="search_word_China">China</string>
+    <string name="search_word_NewYork">NewYork</string>
+    <string name="search_word_Ceramic">Ceramic</string>
+    <string name="search_word_Furniture">Furniture</string>
+    <string name="search_word_Paintings">Paintings</string>
+    <string name="search_word_Sculpture">Sculpture</string>
+    <string name="search_word_Textiles">Textiles</string>
+
 </resources>
