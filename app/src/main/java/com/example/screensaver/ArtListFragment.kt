@@ -26,10 +26,10 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import java.io.IOException
 
-class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
+class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
     lateinit var mView: View
-    var mSearchBarFlag : Boolean = false
+    var mSearchBarFlag: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,7 +96,7 @@ class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
 //                    }
 //                })
                 val museumObject = viewModel.searchMuseumObject(query!!)
-                println(museumObject)
+                println(museumObject.objectIds.last())
                 return false
             }
         })
@@ -105,7 +105,7 @@ class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
         artImageProgress.max = 10
         val artImageMutableList = mutableListOf<Art>()
 
-        GlobalScope.launch(Dispatchers.Main) launch@ {
+        GlobalScope.launch(Dispatchers.Main) launch@{
             if (objectList != null) {
                 for (id in objectList) {
                     if (nowValue == artImageProgress.max) {
@@ -177,7 +177,7 @@ class ArtListFragment : Fragment() , SimpleSearchView.SearchViewListener{
     override fun onSearchViewShownAnimation() {
         Log.d("SimpleSearchView", "onSearchViewShownAnimation")
     }
-    
+
 }
 
 

@@ -13,7 +13,7 @@ class SearchApi {
         .build()
         .create(MuseumObjectService::class.java)
 
-    suspend fun searchMuseumObject(query: String): List<MuseumObject>? {
+    suspend fun searchMuseumObject(query: String): MuseumObj? {
         try {
             val response = service.getMuseumObject(query)
             if (response.isSuccessful) {

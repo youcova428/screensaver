@@ -10,6 +10,6 @@ interface MuseumObjectService {
     @GET("search")
     suspend fun getMuseumObject (
         // 検索するためのクエリ
-        @Query("q") searchWord : String?
-    ): Response<List<MuseumObject>>
+        @Query("q") searchWord: String?
+    ): Response<MuseumObj>
 }

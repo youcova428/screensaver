@@ -12,12 +12,13 @@ import retrofit2.http.Query
 
 class SearchViewModel : ViewModel(){
 
-    var museumObjects : List<MuseumObject>? = null
+    var museumObjects : MuseumObj? = null
     private val searchApi: SearchApi = SearchApi()
 
-    fun searchMuseumObject(query: String) {
+    fun searchMuseumObject(query: String) : MuseumObj{
         viewModelScope.launch(Dispatchers.IO) {
             museumObjects = searchApi.searchMuseumObject(query)
         }
+        return museumObjects!!
     }
 }
