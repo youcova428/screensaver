@@ -120,6 +120,8 @@ class ArtDetailFragment : Fragment() {
         imageOutStream!!.flush()
         imageOutStream!!.close()
 
-//        Toast.makeText(context, "{$title}を押下した。", Toast.LENGTH_SHORT).show()
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(context, "$title をダウンロードした。", Toast.LENGTH_SHORT).show()
+        }
     }
 }

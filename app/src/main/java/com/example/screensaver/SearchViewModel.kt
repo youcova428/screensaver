@@ -10,18 +10,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Query
 
-class SearchViewModel : ViewModel(){
+class SearchViewModel : ViewModel() {
 
-    private lateinit var museumObjects : MuseumObj
+    private lateinit var museumObjects: MuseumObj
     private val searchApi: SearchApi = SearchApi()
 
-    fun searchMuseumObject(query: String) : MuseumObj? {
+    fun searchMuseumObject(query: String): MuseumObj {
 //       return withContext(Dispatchers.Default) {
 //           searchApi.searchMuseumObject(query)
 //        }
         // fixme museumObjects 戻り値がnullになる
-         museumObjects = runBlocking {
-             searchApi.searchMuseumObject(query)!!
+        museumObjects = runBlocking {
+            searchApi.searchMuseumObject(query)!!
         }
         return museumObjects
     }

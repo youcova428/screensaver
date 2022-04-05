@@ -16,20 +16,15 @@
        app:layout_constraintStart_toStartOf="parent"
        app:layout_constraintEnd_toEndOf="parent" />
 
-   <View
-       android:layout_width="match_parent"
-       android:layout_height="1dp"
-       app:layout_constraintBottom_toTopOf="@id/art_detail_download_button"
-       android:layout_marginBottom="@dimen/art_detail_image_bottom_line"
-       app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintEnd_toEndOf="parent"
-       android:background="@color/white"/>
-
    <Button
        android:id="@+id/art_detail_download_button"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:text="@string/art_detail_download"
+       android:textSize="24sp"
+       android:layout_marginStart="8dp"
+       android:layout_marginEnd="8dp"
+       android:layout_marginBottom="20dp"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintEnd_toEndOf="parent"
        app:layout_constraintStart_toStartOf="parent"

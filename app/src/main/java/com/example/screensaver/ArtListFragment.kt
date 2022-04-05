@@ -107,22 +107,22 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
         val artImageMutableList = mutableListOf<Art>()
 
         GlobalScope.launch(Dispatchers.Main) launch@{
-            if (objectList != null) {
-                for (id in objectList) {
-                    if (nowValue == artImageProgress.max) {
-                        //fixme progressbar disappears
-                        artImageProgress.visibility = View.INVISIBLE
-                        setUpRecyclerView(artImageMutableList)
-                        return@launch
-                    }
-                    val artObject = getAsyncArtRequest(id)
-                    if (artObject.primaryImage.isNotEmpty()) {
-                        artImageMutableList.add(artObject)
-                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
-                        nowValue += 1
+                objectList?.let {
+                    for (id in objectList) {
+                        if (nowValue == artImageProgress.max) {
+                            //fixme progressbar disappears
+                            artImageProgress.visibility = View.INVISIBLE
+                            setUpRecyclerView(artImageMutableList)
+                            return@launch
+                        }
+                        val artObject = getAsyncArtRequest(id)
+                        if (artObject.primaryImage.isNotEmpty()) {
+                            artImageMutableList.add(artObject)
+                            Log.d("tag", artImageMutableList[nowValue].primaryImage)
+                            nowValue += 1
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -153,7 +153,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
         }
         artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
             override fun OnArtItemClick(art: Art, view: View) {
-                Toast.makeText(mView!!.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
+                Toast.makeText(mView.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
                 //ArtDetailFragmentへの遷移
                 (requireActivity() as MuseumActivity).navigateToArtDetail(art.objectId)
