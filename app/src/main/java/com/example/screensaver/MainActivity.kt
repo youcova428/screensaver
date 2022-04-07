@@ -143,7 +143,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     }
                     //Set<Uri> -> Set<Image>へ変換する。
                     val convertImageSet = addUriSet.map { Image(it.toString()) }.toSet()
-                    mPrefUtils!!.saveUriSet(URI_COLLECTION, convertImageSet)
+                    mPrefUtils?.saveUriSet(URI_COLLECTION, convertImageSet)
                 } else {
                     //1度立ち上げたが、SharedPreferencesに保存されていない場合
                     if (recyclerView.layoutManager != null) {

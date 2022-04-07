@@ -71,7 +71,7 @@ class ArtDetailFragment : Fragment() {
             }
         })
 
-        mDownloadButton!!.setOnClickListener {
+        mDownloadButton?.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 downloadArtImage(requireContext(), mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
@@ -117,8 +117,8 @@ class ArtDetailFragment : Fragment() {
         }
 
         imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, imageOutStream)
-        imageOutStream!!.flush()
-        imageOutStream!!.close()
+        imageOutStream?.flush()
+        imageOutStream?.close()
 
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(context, "$title をダウンロードした。", Toast.LENGTH_SHORT).show()

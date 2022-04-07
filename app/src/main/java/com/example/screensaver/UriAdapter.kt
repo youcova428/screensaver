@@ -61,11 +61,11 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
      * @param position 配列の位置
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView!!.setImageURI(dataSet[position])
-        holder.imageView!!.setOnClickListener {
+        holder.imageView?.setImageURI(dataSet[position])
+        holder.imageView?.setOnClickListener {
             listener.OnItemClick(dataSet[position])
         }
-        holder.imageView!!.setOnLongClickListener {
+        holder.imageView?.setOnLongClickListener {
             longClickListener.OnItemLongClick(position)
             return@setOnLongClickListener true
         }

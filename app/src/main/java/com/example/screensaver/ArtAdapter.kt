@@ -33,7 +33,7 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
     override fun onBindViewHolder(holder: ArtAdapter.ViewHolder, position: Int) {
         Glide.with(holder.imageView!!.context).load(artList[position].primaryImage)
             .into(holder.imageView!!)
-        holder.imageView!!.setOnClickListener {
+        holder.imageView?.setOnClickListener {
             listener.OnArtItemClick(artList[position], it)
         }
     }

@@ -96,7 +96,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 //                    }
 //                })
                 // fixme museumObject = null　になる　検索ができない。
-                val museumObject = viewModel.searchMuseumObject(query!!)
+                val museumObject = query?.let { it }?.let { viewModel.searchMuseumObject(it) }
                 println("配列の最後は"+ museumObject?.objectIds?.last())
                 return false
             }

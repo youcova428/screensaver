@@ -26,7 +26,6 @@ class PrefUtils {
         }
     }
 
-    constructor()
 
     constructor(context: Context) {
         preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)

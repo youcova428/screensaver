@@ -17,7 +17,7 @@ import java.io.IOException
 class ScreenSaver : DreamService() {
 
     val ACTION_IS_RUNNING = "DreamService_is_running"
-    var screenImage : ImageView? = null
+    var screenImage: ImageView? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -36,9 +36,9 @@ class ScreenSaver : DreamService() {
     override fun onDreamingStarted() {
         super.onDreamingStarted()
         if(image != null) {
-            screenImage!!.setImageBitmap(image)
+            screenImage?.setImageBitmap(image)
         }else {
-            screenImage!!.setImageResource(R.drawable.shiba_dog)
+            screenImage?.setImageResource(R.drawable.shiba_dog)
         }
     }
 
@@ -52,16 +52,16 @@ class ScreenSaver : DreamService() {
 
     fun getDrawableFromAsset(url: String): Drawable? {
         try {
-            return Drawable.createFromStream(applicationContext.assets.open(url),null)
-        } catch (e: IOException ){
+            return Drawable.createFromStream(applicationContext.assets.open(url), null)
+        } catch (e: IOException) {
             e.printStackTrace()
-        }catch (e : IllegalAccessException){
+        } catch (e: IllegalAccessException) {
             e.printStackTrace()
         }
         return null
     }
 
-    fun isMyServiceRunning(context: Context) : Boolean{
+    fun isMyServiceRunning(context: Context): Boolean {
         return LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_IS_RUNNING))
     }
 
