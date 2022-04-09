@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/setting_screen_saver"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_aod_24"
+        android:title="@string/nav_title_dream" />
+
+    <item
+        android:id="@+id/add_image"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_add_to_photos_24"
+        android:title="@string/nav_title_image" />
+
+    <item
+        android:id="@+id/open_metron_mus"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_account_balance_24"
+        android:title="@string/nav_title_metron_mus" />
+
+</menu>

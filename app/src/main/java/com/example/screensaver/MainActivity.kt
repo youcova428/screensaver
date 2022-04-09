@@ -9,12 +9,12 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
-import android.widget.Button
 import android.widget.Switch
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
@@ -73,45 +73,48 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             }
         }
 
-        val photoButton = findViewById<Button>(R.id.photo_button)
-        photoButton.setOnClickListener {
-            multiSelectPhoto()
-        }
+        // bottom navigation　installation
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)
+        bottomNav.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.setting_screen_saver ->
+                    startActivity(Intent(Settings.ACTION_DREAM_SETTINGS))
+                R.id.add_image ->
+                    multiSelectPhoto()
+                R.id.open_metron_mus -> {
+                    val handler = Handler(Looper.getMainLooper())
+                    val request = Request.Builder()
+                        .url("https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=man")
+                        .build()
+                    val client = OkHttpClient()
+                    client.newCall(request).enqueue(object : Callback {
+                        override fun onFailure(call: Call, e: IOException) {
+                            Log.d("tag", "{$e}: request 失敗")
+                        }
 
-        val dreamServiceButton = findViewById<Button>(R.id.service_dream_start_button)
-        dreamServiceButton.setOnClickListener {
-            val intent = Intent(Settings.ACTION_DREAM_SETTINGS)
-            startActivity(intent)
-        }
-
-        //todo 検索方法の設定
-        val httpButton = findViewById<Button>(R.id.http_start_button)
-        httpButton.setOnClickListener {
-            val handler = Handler(Looper.getMainLooper())
-            val request = Request.Builder()
-                .url("https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=man")
-                .build()
-            val client = OkHttpClient()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("tag", "{$e}: request 失敗")
+                        override fun onResponse(call: Call, response: Response) {
+                            val responseText: String? = response.body?.string()
+                            handler.post {
+                                println(responseText)
+                                val type = object : TypeToken<MuseumObject>() {}.type
+                                val museumObject: MuseumObject = Gson().fromJson(responseText, type)
+                                //Art, MuseumObjectIdsどちらもパースできることは確認済み
+                                println(museumObject.objectIds.last())
+                                val intent = Intent(this@MainActivity, MuseumActivity::class.java)
+                                intent.putStringArrayListExtra(
+                                    "MuseumObjectIDs",
+                                    museumObject.objectIds
+                                )
+                                startActivity(intent)
+                            }
+                        }
+                    })
                 }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val responseText: String? = response.body?.string()
-                    handler.post {
-                        println(responseText)
-                        val type = object : TypeToken<MuseumObject>() {}.type
-                        val museumObject: MuseumObject = Gson().fromJson(responseText, type)
-                        //Art, MuseumObjectIdsどちらもパースできることは確認済み
-                        println(museumObject.objectIds.last())
-                        val intent = Intent(this@MainActivity, MuseumActivity::class.java)
-                        intent.putStringArrayListExtra("MuseumObjectIDs", museumObject.objectIds)
-                        startActivity(intent)
-                    }
-                }
-            })
+            }
+            true
         }
+
+        // RecyclerView installation
         saveMutableList = mPrefUtils!!.getUriArray(URI_COLLECTION)
         if (!saveMutableList.isNullOrEmpty()) {
             setUpRecyclerView(imageListConvert(saveMutableList!!))

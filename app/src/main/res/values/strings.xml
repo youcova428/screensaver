@@ -15,4 +15,9 @@
     <string name="search_word_Sculpture">Sculpture</string>
     <string name="search_word_Textiles">Textiles</string>
 
+    // bottom navigation title
+    <string name="nav_title_dream">スクリーンセイバー</string>
+    <string name="nav_title_image">写真</string>
+    <string name="nav_title_metron_mus">美術館</string>
+
 </resources>
