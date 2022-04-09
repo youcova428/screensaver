@@ -19,6 +19,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import kotlin.math.log
 
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
@@ -84,7 +88,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 R.id.open_metron_mus -> {
                     val handler = Handler(Looper.getMainLooper())
                     val request = Request.Builder()
-                        .url("https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=man")
+                        .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=${getYesterdayDate()}")
                         .build()
                     val client = OkHttpClient()
                     client.newCall(request).enqueue(object : Callback {
@@ -258,6 +262,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             uriList.add(Uri.parse(image.uri))
         }
         return uriList
+    }
+
+    /**
+     * 昨日の日付取得メソッド
+     * return 昨日の日付
+     */
+    private fun getYesterdayDate() : String {
+        val todayDate =  LocalDate.now()
+        val ytdDate = todayDate.minusDays(1)
+        val dtFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        Log.d("tag","昨日の日付 $ytdDate")
+        return dtFormat.format(ytdDate)
     }
 
 }
