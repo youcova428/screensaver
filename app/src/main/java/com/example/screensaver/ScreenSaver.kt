@@ -1,23 +1,27 @@
 package com.example.screensaver
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.provider.ContactsContract.Intents.Insert.ACTION
+import android.net.Uri
 import android.service.dreams.DreamService
 import android.widget.ImageView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.screensaver.MainActivity.Companion.FULL_SCREEN
 import com.example.screensaver.MainActivity.Companion.INTERACTIVE
 import com.example.screensaver.MainActivity.Companion.SCREEN_BRIGHT
-import com.example.screensaver.MainActivity.Companion.image
+import com.example.screensaver.MainActivity.Companion.SCREEN_SAVER_INFO
 import java.io.IOException
 
 class ScreenSaver : DreamService() {
 
-    val ACTION_IS_RUNNING = "DreamService_is_running"
-    var screenImage: ImageView? = null
+    companion object {
+        const val URI_SHIBA_PHOTO = "android.resource://com.example.screensaver/drawable/shiba_dog"
+        const val ACTION_IS_RUNNING = "DreamService_is_running"
+    }
+
+    private var screenImage: ImageView? = null
+    private var screenImageInfo: List<String>? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -31,14 +35,16 @@ class ScreenSaver : DreamService() {
             saveBoolean(FULL_SCREEN, isFullscreen)
             saveBoolean(SCREEN_BRIGHT, isScreenBright)
         }
+
+        val defImageInfo = listOf(URI_SHIBA_PHOTO, "1")
+        screenImageInfo = prefUtils.getScreenImageInfo(SCREEN_SAVER_INFO) ?: defImageInfo
+        if (screenImageInfo?.isEmpty() == true) screenImageInfo = defImageInfo
     }
 
     override fun onDreamingStarted() {
         super.onDreamingStarted()
-        if(image != null) {
-            screenImage?.setImageBitmap(image)
-        }else {
-            screenImage?.setImageResource(R.drawable.shiba_dog)
+        screenImageInfo?.let {
+            screenImage?.setImageURI(Uri.parse(it[0]))
         }
     }
 

@@ -26,7 +26,6 @@ class PrefUtils {
         }
     }
 
-
     constructor(context: Context) {
         preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
         editor = preferences.edit()
@@ -37,7 +36,7 @@ class PrefUtils {
         editor = preferences.edit()
     }
 
-    fun saveBoolean(key :String, boolean: Boolean ){
+    fun saveBoolean(key: String, boolean: Boolean) {
         editor.putBoolean(key, boolean).apply()
     }
 
@@ -46,7 +45,13 @@ class PrefUtils {
         editor.putString(key, json).apply()
     }
 
-    fun getBoolean(key: String, defValue: Boolean) : Boolean {
+    // スクリーンセイバー設定画像の情報保存
+    fun saveScreenImageInfo(key: String, setImage: Set<String>) {
+        val json = Gson().toJson(setImage)
+        editor.putString(key, json)
+    }
+
+    fun getBoolean(key: String, defValue: Boolean): Boolean {
         return preferences.getBoolean(key, defValue)
     }
 
@@ -58,6 +63,14 @@ class PrefUtils {
         return Gson().fromJson(json, type)
     }
 
+    // スクリーンセイバーの設定画像の情報取得
+    fun getScreenImageInfo(key: String): List<String>? {
+        val list = Gson().toJson(listOf<String>())
+        val json = preferences.getString(key, list)
+        val type = object : TypeToken<List<String>>() {}.type
+        return Gson().fromJson(json, type)
+    }
+
     fun remove(key: String) {
         editor.remove(key).apply()
     }
@@ -66,7 +79,7 @@ class PrefUtils {
         editor.clear().apply()
     }
 
-    fun getEditor() : SharedPreferences.Editor{
+    fun getEditor(): SharedPreferences.Editor {
         return editor
     }
 

@@ -2,7 +2,7 @@ package com.example.screensaver
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -20,9 +20,7 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.log
 
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
@@ -34,11 +32,12 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
 
     companion object {
-        var image: Bitmap? = null
+        var selectedImage: Bitmap? = null
         const val URI_COLLECTION = "uri_collection_2"
         const val INTERACTIVE = "isInteractive"
         const val FULL_SCREEN = "isFullScreen"
         const val SCREEN_BRIGHT = "isScreenBright"
+        const val SCREEN_SAVER_INFO = "screen_saver_info"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +101,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                                 println(responseText)
                                 val type = object : TypeToken<MuseumObject>() {}.type
                                 val museumObject: MuseumObject = Gson().fromJson(responseText, type)
-                                //Art, MuseumObjectIdsどちらもパースできることは確認済み
                                 println(museumObject.objectIds.last())
                                 val intent = Intent(this@MainActivity, MuseumActivity::class.java)
                                 intent.putStringArrayListExtra(
@@ -207,9 +205,30 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         //ItemClickListener実装
         itemAdapter.setOnImageItemClickListener(object : UriAdapter.OnImageItemClickListener {
             override fun OnItemClick(uri: Uri) {
-                Log.d("tag", "画像クリック ${uri.toString()}")
+                Log.d("tag", "画像クリック $uri")
                 val inputStream = contentResolver?.openInputStream(uri)
-                image = BitmapFactory.decodeStream(inputStream)
+                // 画像の向きを取得する
+                val exifInterface = ExifInterface(inputStream!!)
+                val direction = exifInterface.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
+                )
+                var d: String = direction.toString()
+                when (direction) {
+                    ExifInterface.ORIENTATION_NORMAL ->
+                        Log.d("tag", "画像の向きは正常　$d")
+                    ExifInterface.ORIENTATION_ROTATE_90 ->
+                        Log.d("tag", "画像の向きは左に90° $d")
+                    ExifInterface.ORIENTATION_ROTATE_270 ->
+                        Log.d("tag", "画像の向きは右に90° $d")
+                    ExifInterface.ORIENTATION_ROTATE_180 ->
+                        Log.d("tag", "画像の向きは右に180° $d")
+                    else ->
+                        Log.d("tag", "その他？？ $d")
+                }
+                //　画像の向きを正常に修正する
+                if (direction != 1) d = "1"
+                val ssImageInfo: Set<String> = setOf(uri.toString(), d)
+                mPrefUtils?.saveScreenImageInfo(SCREEN_SAVER_INFO, ssImageInfo)
             }
         })
         //ItemLongClickListener実装
@@ -268,11 +287,11 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
      * 昨日の日付取得メソッド
      * return 昨日の日付
      */
-    private fun getYesterdayDate() : String {
-        val todayDate =  LocalDate.now()
+    private fun getYesterdayDate(): String {
+        val todayDate = LocalDate.now()
         val ytdDate = todayDate.minusDays(1)
         val dtFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        Log.d("tag","昨日の日付 $ytdDate")
+        Log.d("tag", "昨日の日付 $ytdDate")
         return dtFormat.format(ytdDate)
     }
 
