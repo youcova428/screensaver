@@ -35,7 +35,6 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_art_list, container, false)
     }
 
@@ -69,35 +68,51 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
                 return false
             }
 
-            // Enter押下時？？　検索時の動作を書けば良き？？
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // 番号取得までやると　→　リスト再度表示
-                // fixme response null
-//                val url = "https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q={$query}"
-//
-//                val handler = Handler(Looper.getMainLooper())
-//                val request = Request.Builder()
-//                    .url(url)
-//                    .build()
-//                val client = OkHttpClient()
-//                client.newCall(request).enqueue(object : Callback {
-//                    override fun onFailure(call: Call, e: IOException) {
-//                        Log.d("tag", "{$e}: request 失敗")
-//                    }
-//
-//                    override fun onResponse(call: Call, response: Response) {
-//                        val responseText: String? = response.body?.string()
-//                        handler.post {
-//                            println(responseText)
-//                            val type = object : TypeToken<MuseumObject>() {}.type
-//                            val museumObject: MuseumObject = Gson().fromJson(responseText, type)
-//                            println(museumObject.objectIds.last())
-//                        }
-//                    }
-//                })
+                val url = "https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=$query"
+                val handler = Handler(Looper.getMainLooper())
+                val request = Request.Builder()
+                    .url(url)
+                    .build()
+                val client = OkHttpClient()
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        Log.d("tag", "$e: request 失敗")
+                    }
+                    override fun onResponse(call: Call, response: Response) {
+                        val responseText: String? = response.body?.string()
+                        handler.post {
+                            println(responseText)
+                            val type = object : TypeToken<MuseumObject>() {}.type
+                            val msmObject: MuseumObject = Gson().fromJson(responseText, type)
+
+                            println("$query, ${msmObject.objectIds.last()}")
+
+                            GlobalScope.launch(Dispatchers.Main) {
+                                msmObject.let { museumObject ->
+                                    var i = 0
+                                    val artImageMutableList = mutableListOf<Art>()
+                                    for( id in museumObject.objectIds) {
+                                        if( i == 10) {
+                                            setUpRecyclerView(artImageMutableList)
+                                            return@let
+                                        }
+                                        val artObject = getAsyncArtRequest(id)
+                                        if (artObject.primaryImage.isNotEmpty()) {
+                                            artImageMutableList.add(artObject)
+                                            Log.d("tag", artImageMutableList[i].primaryImage)
+                                            i += 1
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                })
                 // fixme museumObject = null　になる　検索ができない。
-                val museumObject = query?.let { it }?.let { viewModel.searchMuseumObject(it) }
-                println("配列の最後は"+ museumObject?.objectIds?.last())
+//                val museumObject = query?.let { it }?.let { viewModel.searchMuseumObject(it) }
+//                println("配列の最後は"+ museumObject?.objectIds?.last())
                 return false
             }
         })
@@ -108,7 +123,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
         GlobalScope.launch(Dispatchers.Main) launch@{
                 objectList?.let {
-                    for (id in objectList) {
+                    for (id in it) {
                         if (nowValue == artImageProgress.max) {
                             //fixme progressbar disappears
                             artImageProgress.visibility = View.INVISIBLE

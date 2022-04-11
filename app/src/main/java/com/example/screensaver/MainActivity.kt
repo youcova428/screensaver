@@ -87,7 +87,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 R.id.open_metron_mus -> {
                     val handler = Handler(Looper.getMainLooper())
                     val request = Request.Builder()
-                        .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=${getYesterdayDate()}")
+//                        .url("https://collectionapi.metmuseum.org/public/collection/v1/objects?metadataDate=${getYesterdayDate()}")
+                        .url("https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=fish")
                         .build()
                     val client = OkHttpClient()
                     client.newCall(request).enqueue(object : Callback {
