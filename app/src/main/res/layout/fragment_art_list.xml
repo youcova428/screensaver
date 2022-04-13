@@ -8,6 +8,7 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/art_search_bar"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -16,11 +17,14 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <FrameLayout
+            android:id="@+id/toolbar_frame_layout"
+            android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <Toolbar
                 android:id="@+id/art_list_toolbar"
+                android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:popupTheme="@style/Theme.AppCompat.Light"

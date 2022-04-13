@@ -17,12 +17,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.ferfalk.simplesearchview.SimpleSearchView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.*
 import java.io.IOException
 
@@ -30,6 +28,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
     lateinit var mView: View
     var mSearchBarFlag: Boolean = false
+    private var mArtSearchView : SimpleSearchView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,21 +44,27 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
             arguments?.getStringArrayList("MuseumObjectIDs")
 
         val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
-        val artSearchView = view.findViewById<SimpleSearchView>(R.id.art_simple_search_view)
+        mArtSearchView = view.findViewById(R.id.art_simple_search_view)
         val toolbar = view.findViewById<Toolbar>(R.id.art_list_toolbar)
         val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
+        val artSearchBar = view.findViewById<AppBarLayout>(R.id.art_search_bar)
+        mArtSearchView?.tabLayout = view.findViewById(R.id.art_search_bar)
 
-        artSearchView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            artSearchView.showSearch()
+        mArtSearchView?.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            mArtSearchView?.showSearch()
         }
 
-        // 検索バーの表示・非表示
+        // fixme 検索バーの表示・非表示
         toolbar.setOnClickListener {
-            if (mSearchBarFlag) artSearchView.closeSearch() else artSearchView.showSearch()
+            if (mArtSearchView?.isSearchOpen == true) {
+                mArtSearchView?.closeSearch()
+            } else {
+                mArtSearchView?.showSearch(true)
+            }
         }
 
         // 検索バーの設置　
-        artSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
+        mArtSearchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
@@ -79,6 +84,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
                     override fun onFailure(call: Call, e: IOException) {
                         Log.d("tag", "$e: request 失敗")
                     }
+
                     override fun onResponse(call: Call, response: Response) {
                         val responseText: String? = response.body?.string()
                         handler.post {
@@ -88,12 +94,12 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
                             println("$query, ${msmObject.objectIds.last()}")
 
-                            GlobalScope.launch(Dispatchers.Main) {
+                            CoroutineScope(Dispatchers.Main).launch{
                                 msmObject.let { museumObject ->
                                     var i = 0
                                     val artImageMutableList = mutableListOf<Art>()
-                                    for( id in museumObject.objectIds) {
-                                        if( i == 10) {
+                                    for (id in museumObject.objectIds) {
+                                        if (i == 10) {
                                             setUpRecyclerView(artImageMutableList)
                                             return@let
                                         }
@@ -105,7 +111,6 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
                                         }
                                     }
                                 }
-
                             }
                         }
                     }
@@ -121,23 +126,23 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
         artImageProgress.max = 10
         val artImageMutableList = mutableListOf<Art>()
 
-        GlobalScope.launch(Dispatchers.Main) launch@{
-                objectList?.let {
-                    for (id in it) {
-                        if (nowValue == artImageProgress.max) {
-                            //fixme progressbar disappears
-                            artImageProgress.visibility = View.INVISIBLE
-                            setUpRecyclerView(artImageMutableList)
-                            return@launch
-                        }
-                        val artObject = getAsyncArtRequest(id)
-                        if (artObject.primaryImage.isNotEmpty()) {
-                            artImageMutableList.add(artObject)
-                            Log.d("tag", artImageMutableList[nowValue].primaryImage)
-                            nowValue += 1
-                        }
+        CoroutineScope(Dispatchers.Main).launch{
+            objectList?.let {
+                for (id in it) {
+                    if (nowValue == artImageProgress.max) {
+                        //fixme progressbar disappears
+                        artImageProgress.visibility = View.INVISIBLE
+                        setUpRecyclerView(artImageMutableList)
+                        return@launch
+                    }
+                    val artObject = getAsyncArtRequest(id)
+                    if (artObject.primaryImage.isNotEmpty()) {
+                        artImageMutableList.add(artObject)
+                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
+                        nowValue += 1
                     }
                 }
+            }
         }
     }
 
