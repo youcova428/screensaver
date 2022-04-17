@@ -1,8 +1,6 @@
 package com.example.screensaver
 
 import com.google.gson.annotations.SerializedName
-import com.squareup.moshi.Json
-import java.util.ArrayList
 
 class MuseumObject {
 
@@ -12,8 +10,4 @@ class MuseumObject {
     @SerializedName("objectIDs")
     val objectIds = arrayListOf<String>()
 }
-
-data class MuseumObj (
-    @Json(name = "objectIds") val objectIds : List<String>
-)
 

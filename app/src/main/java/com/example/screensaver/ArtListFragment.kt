@@ -12,23 +12,21 @@ import android.widget.Toast
 import android.widget.Toolbar
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.ferfalk.simplesearchview.SimpleSearchView
-import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
-import okhttp3.*
-import java.io.IOException
 
 class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
     lateinit var mView: View
     var mSearchBarFlag: Boolean = false
-    private var mArtSearchView : SimpleSearchView? = null
+    private var mArtSearchView: SimpleSearchView? = null
+    private val mArtImageMutableList = mutableListOf<Art>()
+    private var mArtImageProgress: ProgressBar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,15 +38,11 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mView = view
-        val objectList =
-            arguments?.getStringArrayList("MuseumObjectIDs")
 
-        val artImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
+        mArtImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         mArtSearchView = view.findViewById(R.id.art_simple_search_view)
         val toolbar = view.findViewById<Toolbar>(R.id.art_list_toolbar)
         val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
-        val artSearchBar = view.findViewById<AppBarLayout>(R.id.art_search_bar)
-        mArtSearchView?.tabLayout = view.findViewById(R.id.art_search_bar)
 
         mArtSearchView?.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             mArtSearchView?.showSearch()
@@ -74,75 +68,21 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val url = "https://collectionapi.metmuseum.org/public/collection/v1/search?medium=Paintings&hasImages=true&q=$query"
-                val handler = Handler(Looper.getMainLooper())
-                val request = Request.Builder()
-                    .url(url)
-                    .build()
-                val client = OkHttpClient()
-                client.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        Log.d("tag", "$e: request 失敗")
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        val responseText: String? = response.body?.string()
-                        handler.post {
-                            println(responseText)
-                            val type = object : TypeToken<MuseumObject>() {}.type
-                            val msmObject: MuseumObject = Gson().fromJson(responseText, type)
-
-                            println("$query, ${msmObject.objectIds.last()}")
-
-                            CoroutineScope(Dispatchers.Main).launch{
-                                msmObject.let { museumObject ->
-                                    var i = 0
-                                    val artImageMutableList = mutableListOf<Art>()
-                                    for (id in museumObject.objectIds) {
-                                        if (i == 10) {
-                                            setUpRecyclerView(artImageMutableList)
-                                            return@let
-                                        }
-                                        val artObject = getAsyncArtRequest(id)
-                                        if (artObject.primaryImage.isNotEmpty()) {
-                                            artImageMutableList.add(artObject)
-                                            Log.d("tag", artImageMutableList[i].primaryImage)
-                                            i += 1
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-                // fixme museumObject = null　になる　検索ができない。
-//                val museumObject = query?.let { it }?.let { viewModel.searchMuseumObject(it) }
-//                println("配列の最後は"+ museumObject?.objectIds?.last())
+                // 引数を持ってsearchMuseumObjectを呼びにいく。
+                query?.let { viewModel.searchMuseumObject(it) }
                 return false
             }
         })
 
-        var nowValue = artImageProgress.progress
-        artImageProgress.max = 10
-        val artImageMutableList = mutableListOf<Art>()
+        // 画面遷移した後でAPIを叩く
+        viewModel.searchInitialMsmObj("sea")
 
-        CoroutineScope(Dispatchers.Main).launch{
-            objectList?.let {
-                for (id in it) {
-                    if (nowValue == artImageProgress.max) {
-                        //fixme progressbar disappears
-                        artImageProgress.visibility = View.INVISIBLE
-                        setUpRecyclerView(artImageMutableList)
-                        return@launch
-                    }
-                    val artObject = getAsyncArtRequest(id)
-                    if (artObject.primaryImage.isNotEmpty()) {
-                        artImageMutableList.add(artObject)
-                        Log.d("tag", artImageMutableList[nowValue].primaryImage)
-                        nowValue += 1
-                    }
-                }
-            }
+        viewModel.initialMsmObjLiveData.observe(viewLifecycleOwner) {
+            searchResultSet(it)
+        }
+
+        viewModel.msmObjLiveData.observe(viewLifecycleOwner) {
+            searchResultSet(it)
         }
     }
 
@@ -197,6 +137,27 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
 
     override fun onSearchViewShownAnimation() {
         Log.d("SimpleSearchView", "onSearchViewShownAnimation")
+    }
+
+    private fun searchResultSet(msmObject: MuseumObjectService.MsmObjResponse) {
+        var nowValue = 0
+        mArtImageProgress?.max = 10
+        mArtImageProgress?.visibility = View.VISIBLE
+        CoroutineScope(Dispatchers.Main).launch {
+            for (id in msmObject.objectIDs) {
+                if (nowValue == mArtImageProgress?.max) {
+                    mArtImageProgress?.visibility = View.INVISIBLE
+                    setUpRecyclerView(mArtImageMutableList)
+                    return@launch
+                }
+                val artObject = getAsyncArtRequest(id)
+                if (artObject.primaryImage.isNotEmpty()) {
+                    mArtImageMutableList.add(artObject)
+                    Log.d("tag", mArtImageMutableList[nowValue].primaryImage)
+                    nowValue += 1
+                }
+            }
+        }
     }
 
 }

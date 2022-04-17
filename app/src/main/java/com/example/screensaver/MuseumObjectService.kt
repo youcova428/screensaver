@@ -1,15 +1,22 @@
 package com.example.screensaver
 
-import android.telecom.Call
+import com.squareup.moshi.Json
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface MuseumObjectService {
+
     // 検索用のURLを書く
     @GET("search")
     suspend fun getMuseumObject (
         // 検索するためのクエリ
         @Query("q") searchWord: String?
-    ): Response<MuseumObj>
+    ): Response<MsmObjResponse>
+
+    data class MsmObjResponse (
+        @Json(name ="total" ) val total : String,
+        @Json(name = "objectIDs") val objectIDs : List<String>
+    )
+
 }

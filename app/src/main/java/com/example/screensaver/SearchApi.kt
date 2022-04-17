@@ -6,14 +6,14 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
 
 class SearchApi {
-    var museumObject: MuseumObject? = null
-    val service: MuseumObjectService = Retrofit.Builder()
+
+    private val service: MuseumObjectService = Retrofit.Builder()
         .baseUrl("https://collectionapi.metmuseum.org/public/collection/v1/")
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
         .create(MuseumObjectService::class.java)
 
-    suspend fun searchMuseumObject(query: String): MuseumObj? {
+    suspend fun searchMuseumObject(query: String): MuseumObjectService.MsmObjResponse? {
         try {
             val response = service.getMuseumObject(query)
             if (response.isSuccessful) {
