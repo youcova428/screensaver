@@ -12,9 +12,9 @@ interface MuseumObjectService {
     suspend fun getMuseumObject (
         // 検索するためのクエリ
         @Query("q") searchWord: String?
-    ): Response<MsmObjResponse>
+    ): Response<MuseumObject>
 
-    data class MsmObjResponse (
+    data class MuseumObject (
         @Json(name ="total" ) val total : String,
         @Json(name = "objectIDs") val objectIDs : List<String>
     )

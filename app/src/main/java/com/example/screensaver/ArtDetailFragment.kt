@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -34,13 +35,12 @@ class ArtDetailFragment : Fragment() {
 
     private var mImageView: ImageView? = null
     private var mDownloadButton: Button? = null
-    private var mArtDetail: Art? = null
+    private var mArtDetail: ArtOjt? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_art_detail, container, false)
     }
 
@@ -48,45 +48,32 @@ class ArtDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mImageView = view.findViewById(R.id.art_detail_image)
         mDownloadButton = view.findViewById(R.id.art_detail_download_button)
+        val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
 
         //ArtListFragmentからid受け取り
-        val id = arguments?.get("ArtId")
-
-        val handler = Handler(Looper.getMainLooper())
-        val request = Request.Builder()
-            .url("https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}").build()
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val responseText: String? = response.body?.string()
-                handler.post {
-                    println(responseText)
-                    val type = object : TypeToken<Art>() {}.type
-                    mArtDetail = Gson().fromJson(responseText, type)
-                    Glide.with(this@ArtDetailFragment).load(mArtDetail!!.primaryImage)
+        val id = arguments?.get("ArtId") as String
+        viewModel.searchArtObject(id)
+        viewModel.artOjt.observe(viewLifecycleOwner) {
+            mArtDetail = it
+            Glide.with(this@ArtDetailFragment).load(it.primaryImage)
                         .into(view.findViewById(R.id.art_detail_image))
-                }
-            }
-        })
+        }
 
         mDownloadButton?.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 downloadArtImage(requireContext(), mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
-
         }
     }
 
     private fun downloadArtImage(context: Context, artUri: String, title: String) {
-        val connection = URL(artUri).openConnection()
-        connection.doInput = true
-        connection.connectTimeout = 5000
-        connection.readTimeout = 30000
-        connection.useCaches = true
+        val connection = URL(artUri).openConnection().apply {
+            doInput = true
+            connectTimeout = 5000
+            readTimeout = 30000
+            useCaches = true
+        }
         val imageInputStream : InputStream = connection.getInputStream()
-
         val imageBitmap: Bitmap
         val fileName = "{$title.jpg}"
         val mimeType = "image/jpeg"

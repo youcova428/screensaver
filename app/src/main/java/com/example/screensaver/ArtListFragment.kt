@@ -1,8 +1,6 @@
 package com.example.screensaver
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -139,7 +137,7 @@ class ArtListFragment : Fragment(), SimpleSearchView.SearchViewListener {
         Log.d("SimpleSearchView", "onSearchViewShownAnimation")
     }
 
-    private fun searchResultSet(msmObject: MuseumObjectService.MsmObjResponse) {
+    private fun searchResultSet(msmObject: MuseumObjectService.MuseumObject) {
         var nowValue = 0
         mArtImageProgress?.max = 10
         mArtImageProgress?.visibility = View.VISIBLE
