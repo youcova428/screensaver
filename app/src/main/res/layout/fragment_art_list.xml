@@ -30,12 +30,13 @@
                 app:popupTheme="@style/Theme.AppCompat.Light"
                 app:title="@string/museum_name"/>
 
-            <com.ferfalk.simplesearchview.SimpleSearchView
+            <SearchView
                 android:id="@+id/art_simple_search_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:type="card"
-                android:visibility="visible"/>
+                android:iconifiedByDefault="false"
+                android:layout_margin="4dp"
+                android:queryHint="@string/search_bar_hint"/>
 
         </FrameLayout>
 
