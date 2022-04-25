@@ -4,6 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/top_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/toolbar_menu"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+
     <TextView
         android:id="@+id/text_switch_interactive"
         android:layout_width="wrap_content"
@@ -12,7 +22,7 @@
         app:layout_constraintBottom_toTopOf="@id/text_switch_fullscreen"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@id/text_switch_screenbright"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/top_toolbar"  />
 
     <Switch
         android:id="@+id/switch_service_interactive"
@@ -22,7 +32,7 @@
         app:layout_constraintBottom_toTopOf="@id/switch_service_fullscreen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/top_toolbar" />
 
     <TextView
         android:id="@+id/text_switch_fullscreen"

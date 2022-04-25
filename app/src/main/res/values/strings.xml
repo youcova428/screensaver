@@ -23,4 +23,7 @@
     <string name="nav_title_image">写真</string>
     <string name="nav_title_metron_mus">美術館</string>
 
+    // toolBar
+    <string name="toolbar_setting">設定</string>
+
 </resources>
