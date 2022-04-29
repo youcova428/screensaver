@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -41,6 +42,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
 
         mUriList = mutableListOf()
         mPrefUtils = PrefUtils.with(applicationContext)
+
+        val toolbar = findViewById<MaterialToolbar>(R.id.top_toolbar)
+        toolbar.title = getString(R.string.app_name)
 
         val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
         switchInteractive.isChecked = mPrefUtils!!.getBoolean(INTERACTIVE, false)
