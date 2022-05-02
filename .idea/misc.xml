@@ -3,14 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.1175925925925926" />
         <entry key="..\:/Users/81909/ScreenSaver/app/src/main/res/layout/fragment_art_detail.xml" value="0.22418478260869565" />
         <entry key="..\:/Users/81909/ScreenSaver/app/src/main/res/layout/fragment_art_list.xml" value="0.43983402489626555" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.22708333333333333" />
-        <entry key="app/src/main/res/layout/activity_museum.xml" value="0.27291666666666664" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_museum.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_art_detail.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_art_list.xml" value="0.18802083333333333" />
+        <entry key="app/src/main/res/layout/fragment_setting.xml" value="0.353125" />
+        <entry key="app/src/main/res/layout/pref_setting.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/recyclerview_art_item.xml" value="0.30117753623188404" />
         <entry key="app/src/main/res/layout/recyclerview_image_item.xml" value="0.22708333333333333" />
+        <entry key="app/src/main/res/menu/toolbar_menu.xml" value="0.353125" />
+        <entry key="app/src/main/res/xml/pref_main.xml" value="0.1" />
       </map>
     </option>
   </component>

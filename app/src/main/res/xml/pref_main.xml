@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_screen_saver">
+
+        <SwitchPreference
+            android:key="interactive"
+            android:defaultValue="false"
+            android:title="@string/pref_interactive" />
+
+        <SwitchPreference
+            android:key="fullscreen"
+            android:defaultValue="true"
+            android:title="@string/pref_full_screen" />
+
+        <SwitchPreference
+            android:key="screen_bright"
+            android:defaultValue="false"
+            android:title="@string/pref_screen_bright" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

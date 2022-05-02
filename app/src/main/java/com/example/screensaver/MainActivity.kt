@@ -8,10 +8,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Switch
-import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
@@ -43,8 +41,21 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         mUriList = mutableListOf()
         mPrefUtils = PrefUtils.with(applicationContext)
 
-        val toolbar = findViewById<MaterialToolbar>(R.id.top_toolbar)
-        toolbar.title = getString(R.string.app_name)
+        findViewById<MaterialToolbar>(R.id.top_toolbar).apply {
+            title = getString(R.string.app_name)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.setting ->
+                    supportFragmentManager
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.main_container, SettingFragment())
+                        .commit()
+                }
+                true
+            }
+        }
+
 
         val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
         switchInteractive.isChecked = mPrefUtils!!.getBoolean(INTERACTIVE, false)

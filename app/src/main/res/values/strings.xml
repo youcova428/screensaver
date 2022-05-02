@@ -26,4 +26,10 @@
     // toolBar
     <string name="toolbar_setting">設定</string>
 
+    // setting
+    <string name="pref_screen_saver">スクリーンセイバー設定</string>
+    <string name="pref_interactive">Interactive</string>
+    <string name="pref_full_screen">FullScreen</string>
+    <string name="pref_screen_bright">ScreenBright</string>
+
 </resources>
