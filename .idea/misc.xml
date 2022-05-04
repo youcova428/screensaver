@@ -6,8 +6,10 @@
         <entry key="../../../../layout/custom_preview.xml" value="0.1175925925925926" />
         <entry key="..\:/Users/81909/ScreenSaver/app/src/main/res/layout/fragment_art_detail.xml" value="0.22418478260869565" />
         <entry key="..\:/Users/81909/ScreenSaver/app/src/main/res/layout/fragment_art_list.xml" value="0.43983402489626555" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.116" />
         <entry key="app/src/main/res/drawable/ic_baseline_account_balance_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_to_photos_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_aod_24.xml" value="0.116" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.15983734130859373" />
