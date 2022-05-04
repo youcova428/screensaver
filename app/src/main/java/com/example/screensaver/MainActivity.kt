@@ -41,6 +41,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         mUriList = mutableListOf()
         mPrefUtils = PrefUtils.with(applicationContext)
 
+        // toolbar 設定アイコン画面遷移
         findViewById<MaterialToolbar>(R.id.top_toolbar).apply {
             title = getString(R.string.app_name)
             setOnMenuItemClickListener {
@@ -53,37 +54,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                         .commit()
                 }
                 true
-            }
-        }
-
-
-        val switchInteractive = findViewById<Switch>(R.id.switch_service_interactive)
-        switchInteractive.isChecked = mPrefUtils!!.getBoolean(INTERACTIVE, false)
-        Log.d("tag", switchInteractive.isChecked.toString())
-        switchInteractive.setOnCheckedChangeListener { _, isChecked ->
-            mPrefUtils!!.getEditor().apply() {
-                putBoolean(INTERACTIVE, isChecked)
-                apply()
-            }
-        }
-
-        val switchFullscreen = findViewById<Switch>(R.id.switch_service_fullscreen)
-        switchFullscreen.isChecked = mPrefUtils!!.getBoolean(FULL_SCREEN, true)
-        Log.d("tag", switchFullscreen.isChecked.toString())
-        switchFullscreen.setOnCheckedChangeListener { _, isChecked ->
-            mPrefUtils!!.getEditor().apply() {
-                putBoolean(FULL_SCREEN, isChecked)
-                apply()
-            }
-        }
-
-        val switchScreenBright = findViewById<Switch>(R.id.switch_service_screenbright)
-        switchScreenBright.isChecked = mPrefUtils!!.getBoolean(SCREEN_BRIGHT, false)
-        Log.d("tag", switchScreenBright.isChecked.toString())
-        switchScreenBright.setOnCheckedChangeListener { _, isChecked ->
-            mPrefUtils!!.getEditor().apply() {
-                putBoolean(SCREEN_BRIGHT, isChecked)
-                apply()
             }
         }
 

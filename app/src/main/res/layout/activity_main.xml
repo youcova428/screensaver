@@ -14,72 +14,72 @@
         app:menu="@menu/toolbar_menu"
         style="@style/Widget.MaterialComponents.Toolbar.Primary" />
 
-    <TextView
-        android:id="@+id/text_switch_interactive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SwitchInteractive"
-        app:layout_constraintBottom_toTopOf="@id/text_switch_fullscreen"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="@id/text_switch_screenbright"
-        app:layout_constraintTop_toBottomOf="@id/top_toolbar"  />
+<!--    <TextView-->
+<!--        android:id="@+id/text_switch_interactive"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="SwitchInteractive"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/text_switch_fullscreen"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="@id/text_switch_screenbright"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/top_toolbar"  />-->
 
-    <Switch
-        android:id="@+id/switch_service_interactive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
-        app:layout_constraintBottom_toTopOf="@id/switch_service_fullscreen"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/top_toolbar" />
+<!--    <Switch-->
+<!--        android:id="@+id/switch_service_interactive"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginEnd="40dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/switch_service_fullscreen"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/top_toolbar" />-->
 
-    <TextView
-        android:id="@+id/text_switch_fullscreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SwitchFullscreen"
-        app:layout_constraintBottom_toTopOf="@id/text_switch_screenbright"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="@id/text_switch_screenbright"
-        app:layout_constraintTop_toBottomOf="@id/text_switch_interactive" />
+<!--    <TextView-->
+<!--        android:id="@+id/text_switch_fullscreen"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="SwitchFullscreen"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/text_switch_screenbright"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="@id/text_switch_screenbright"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/text_switch_interactive" />-->
 
-    <Switch
-        android:id="@+id/switch_service_fullscreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
-        app:layout_constraintBottom_toTopOf="@id/switch_service_screenbright"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/switch_service_interactive" />
+<!--    <Switch-->
+<!--        android:id="@+id/switch_service_fullscreen"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginEnd="40dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/switch_service_screenbright"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/switch_service_interactive" />-->
 
-    <TextView
-        android:id="@+id/text_switch_screenbright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SwitchScreenBright"
-        app:layout_constraintBottom_toBottomOf="@id/switch_service_screenbright"
-        app:layout_constraintEnd_toStartOf="@id/switch_service_screenbright"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_switch_fullscreen" />
+<!--    <TextView-->
+<!--        android:id="@+id/text_switch_screenbright"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="SwitchScreenBright"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/switch_service_screenbright"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/switch_service_screenbright"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/text_switch_fullscreen" />-->
 
-    <Switch
-        android:id="@+id/switch_service_screenbright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintTop_toBottomOf="@id/switch_service_fullscreen" />
+<!--    <Switch-->
+<!--        android:id="@+id/switch_service_screenbright"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginEnd="40dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/switch_service_fullscreen" />-->
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/switch_service_screenbright"
+        app:layout_constraintTop_toBottomOf="@id/top_toolbar"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
