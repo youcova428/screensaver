@@ -7,7 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.Switch
+import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -47,11 +47,20 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.setting ->
-                    supportFragmentManager
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.main_container, SettingFragment())
-                        .commit()
+                        supportFragmentManager
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.main_container, SettingFragment())
+                            .commit()
+                }
+
+                navigationIcon ?: setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+                // 押下時 処理
+                setNavigationOnClickListener {
+                    navigationIcon?.let {
+                        navigationIcon = null
+                        onBackPressed()
+                    }
                 }
                 true
             }
@@ -78,6 +87,14 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         if (!saveMutableList.isNullOrEmpty()) {
             setUpRecyclerView(imageListConvert(saveMutableList!!))
         }
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.home -> onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /**
