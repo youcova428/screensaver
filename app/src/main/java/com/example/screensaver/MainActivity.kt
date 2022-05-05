@@ -58,7 +58,6 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 // 押下時 処理
                 setNavigationOnClickListener {
                     navigationIcon?.let {
-                        navigationIcon = null
                         onBackPressed()
                     }
                 }
@@ -89,12 +88,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     }
 
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.home -> onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onBackPressed() {
+        findViewById<MaterialToolbar>(R.id.top_toolbar).navigationIcon = null
+        super.onBackPressed()
     }
 
     /**
