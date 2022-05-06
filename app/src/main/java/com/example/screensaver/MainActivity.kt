@@ -1,13 +1,11 @@
 package com.example.screensaver
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -25,9 +23,9 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     var saveMutableList: MutableList<Image>? = null
     var mPrefUtils: PrefUtils? = null
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
+    private var mToolBar : MaterialToolbar? = null
 
     companion object {
-        var selectedImage: Bitmap? = null
         const val URI_COLLECTION = "uri_collection_2"
         const val INTERACTIVE = "isInteractive"
         const val FULL_SCREEN = "isFullScreen"
@@ -42,16 +40,20 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         mPrefUtils = PrefUtils.with(applicationContext)
 
         // toolbar 設定アイコン画面遷移
-        findViewById<MaterialToolbar>(R.id.top_toolbar).apply {
+        mToolBar = findViewById<MaterialToolbar>(R.id.top_toolbar).apply {
             title = getString(R.string.app_name)
             setOnMenuItemClickListener {
+                val shownFragment = supportFragmentManager.findFragmentById(R.id.main_container)
                 when (it.itemId) {
-                    R.id.setting ->
-                        supportFragmentManager
-                            .beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.main_container, SettingFragment())
-                            .commit()
+                    R.id.setting -> {
+                        if (shownFragment !is SettingFragment) {
+                            supportFragmentManager
+                                .beginTransaction()
+                                .addToBackStack(null)
+                                .replace(R.id.main_container, SettingFragment())
+                                .commit()
+                        }
+                    }
                 }
 
                 navigationIcon ?: setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
@@ -89,7 +91,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     override fun onBackPressed() {
-        findViewById<MaterialToolbar>(R.id.top_toolbar).navigationIcon = null
+        mToolBar?.navigationIcon = null
         super.onBackPressed()
     }
 
