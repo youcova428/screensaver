@@ -7,9 +7,6 @@ import android.net.Uri
 import android.service.dreams.DreamService
 import android.widget.ImageView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.screensaver.MainActivity.Companion.FULL_SCREEN
-import com.example.screensaver.MainActivity.Companion.INTERACTIVE
-import com.example.screensaver.MainActivity.Companion.SCREEN_BRIGHT
 import com.example.screensaver.MainActivity.Companion.SCREEN_SAVER_INFO
 import java.io.IOException
 
@@ -25,15 +22,19 @@ class ScreenSaver : DreamService() {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        isInteractive = false
-        isFullscreen = true
-        isScreenBright = false
+        // sharedPreference から値を取得する　設定されてなければデフォルトの値になる。
+        val prefUtils = PrefUtils.with(applicationContext).apply {
+            isInteractive = getBoolean(getString(R.string.pref_key_interactive), false)
+            isFullscreen = getBoolean(getString(R.string.pref_key_fullscreen), true)
+            isScreenBright = getBoolean(getString(R.string.pref_key_screen_bright), false)
+        }
+
         setContentView(R.layout.screen_saver)
         screenImage = findViewById(R.id.screen_picture)
-        val prefUtils = PrefUtils.with(applicationContext).apply {
-            saveBoolean(INTERACTIVE, isInteractive)
-            saveBoolean(FULL_SCREEN, isFullscreen)
-            saveBoolean(SCREEN_BRIGHT, isScreenBright)
+        prefUtils.apply {
+            saveBoolean(getString(R.string.pref_key_interactive), isInteractive)
+            saveBoolean(getString(R.string.pref_key_fullscreen), isFullscreen)
+            saveBoolean(getString(R.string.pref_key_screen_bright), isScreenBright)
         }
 
         val defImageInfo = listOf(URI_SHIBA_PHOTO, "1")

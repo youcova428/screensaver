@@ -36,5 +36,8 @@
     <string name="pref_key_interactive">interactive</string>
     <string name="pref_key_fullscreen">fullscreen</string>
     <string name="pref_key_screen_bright">screen_bright</string>
+    <string name="pref_interactive_description">タップされても閉じるか設定</string>
+    <string name="pref_full_screen_description">フルスクリーンモードであるか設定</string>
+    <string name="pref_screen_bright_description">画面を明るく保つか設定</string>
 
 </resources>

@@ -26,10 +26,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     private var mToolBar : MaterialToolbar? = null
 
     companion object {
-        const val URI_COLLECTION = "uri_collection_2"
-        const val INTERACTIVE = "isInteractive"
-        const val FULL_SCREEN = "isFullScreen"
-        const val SCREEN_BRIGHT = "isScreenBright"
+        const val URI_COLLECTION = "uri_collection"
         const val SCREEN_SAVER_INFO = "screen_saver_info"
     }
 

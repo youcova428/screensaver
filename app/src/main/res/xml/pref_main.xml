@@ -6,16 +6,19 @@
         <SwitchPreference
             android:key="interactive"
             android:defaultValue="false"
+            android:summary="@string/pref_interactive_description"
             android:title="@string/pref_interactive" />
 
         <SwitchPreference
             android:key="fullscreen"
             android:defaultValue="true"
+            android:summary="@string/pref_full_screen_description"
             android:title="@string/pref_full_screen" />
 
         <SwitchPreference
             android:key="screen_bright"
             android:defaultValue="false"
+            android:summary="@string/pref_screen_bright_description"
             android:title="@string/pref_screen_bright" />
 
     </PreferenceCategory>
