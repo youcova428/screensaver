@@ -4,7 +4,6 @@ package com.example.screensaver
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.screensaver.MuseumObjectService.MuseumObject
 import kotlinx.coroutines.*
 
 class SearchViewModel : ViewModel() {

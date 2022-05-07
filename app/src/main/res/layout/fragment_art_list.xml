@@ -41,17 +41,21 @@
         </FrameLayout>
 
         <com.google.android.material.chip.ChipGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:id="@+id/chip_group_geolocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_europe"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="@string/search_word_Europe"/>
+                android:text="@string/search_word_Europe" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_france"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,6 +63,7 @@
                 android:text="@string/search_word_France"/>
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_italy"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,27 +71,39 @@
                 android:text="@string/search_word_Italy"/>
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_china"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="@string/search_word_China"/>
+                android:text="@string/search_word_China" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_newyork"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="@string/search_word_NewYork"/>
+                android:text="@string/search_word_NewYork" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_ceramic"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-               android:layout_width="wrap_content"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="@string/search_word_Ceramic"/>
+                android:text="@string/search_word_Ceramic" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_furniture"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,6 +111,7 @@
                 android:text="@string/search_word_Furniture"/>
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_paintings"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -101,6 +119,7 @@
                 android:text="@string/search_word_Paintings"/>
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_sculpture"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,6 +127,7 @@
                 android:text="@string/search_word_Sculpture"/>
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_textiles"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

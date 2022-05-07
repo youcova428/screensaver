@@ -10,10 +10,13 @@ import android.widget.SearchView
 import android.widget.Toast
 import android.widget.Toolbar
 import androidx.annotation.WorkerThread
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
@@ -38,7 +41,6 @@ class ArtListFragment : Fragment() {
 
         mArtImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         mArtSearchView = view.findViewById(R.id.art_simple_search_view)
-        val toolbar = view.findViewById<Toolbar>(R.id.art_list_toolbar)
         val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
 
         // 検索バーの設置　
@@ -72,6 +74,25 @@ class ArtListFragment : Fragment() {
                 searchResultSet(it)
             }
         }
+
+        // ChipGroup設置
+        val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
+        geoChipGroup.children.forEach {
+            (it as Chip).setOnClickListener {
+                val chipText = (it as Chip).text
+                Log.d("tag", "$chipText")
+            }
+        }
+
+        val mediumChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_medium)
+        mediumChipGroup.children.forEach {
+            (it as Chip).setOnClickListener {
+                val chipText = (it as Chip).text
+                Log.d("tag", "$chipText")
+            }
+        }
+
+
     }
 
     @WorkerThread
@@ -109,7 +130,7 @@ class ArtListFragment : Fragment() {
         })
     }
 
-    private fun searchResultSet(msmObject: MuseumObjectService.MuseumObject) {
+    private fun searchResultSet(msmObject: MuseumObject) {
         var nowValue = 0
         mArtImageProgress?.max = 10
         mArtImageProgress?.visibility = View.VISIBLE

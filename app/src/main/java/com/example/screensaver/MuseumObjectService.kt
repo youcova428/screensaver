@@ -14,9 +14,11 @@ interface MuseumObjectService {
         @Query("q") searchWord: String?
     ): Response<MuseumObject>
 
-    data class MuseumObject (
-        @Json(name ="total" ) val total : String,
-        @Json(name = "objectIDs") val objectIDs : List<String>
-    )
-
+    // todo Chipが押下された際の検索
 }
+
+
+data class MuseumObject (
+    @Json(name ="total" ) val total : String,
+    @Json(name = "objectIDs") val objectIDs : List<String>
+)
