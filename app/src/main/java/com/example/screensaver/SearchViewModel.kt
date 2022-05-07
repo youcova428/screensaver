@@ -35,7 +35,13 @@ class SearchViewModel : ViewModel() {
 
     fun searchMediumMsmObj(medium: String, query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            msmObjLiveData.postValue(searchApi.searchMediumMsmObj(medium, query))
+            msmObjLiveData.postValue(searchApi.searchLocationMediumMsmObj(medium, query))
+        }
+    }
+
+    fun searchLocationMediumMsmObj(location: String, medium: String, query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            msmObjLiveData.postValue(searchApi.searchLocationMediumMsmObj(location, medium, query))
         }
     }
 

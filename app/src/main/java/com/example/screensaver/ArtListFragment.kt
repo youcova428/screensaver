@@ -60,6 +60,7 @@ class ArtListFragment : Fragment() {
                 mArtImageMutableList = mutableListOf()
 
                 val geoChipBoolList = mutableListOf<Boolean>().apply {
+                    println("===== GeoLocationChipGroup ====")
                     geoChipGroup.children.forEach {
                         Log.d("tag", (it as Chip).isChecked.toString())
                         add(it.isChecked)
@@ -67,6 +68,7 @@ class ArtListFragment : Fragment() {
                 }
 
                 val mediumChipBoolList = mutableListOf<Boolean>().apply {
+                    println("===== MediumChipGroup ====")
                     mediumChipGroup.children.forEach {
                         Log.d("tag", (it as Chip).isChecked.toString())
                         add(it.isChecked)
@@ -78,8 +80,8 @@ class ArtListFragment : Fragment() {
 
                 when {
                     geoIsContains && mediumContains -> {
-                        // todo geoLocation と medium　の検索条件の場合
-                        Log.d("tag", "chipどっちもON")
+                        viewModel.searchLocationMediumMsmObj(mGeoLocation!!, mMedium!!, query!!)
+                        Log.d("tag", "chip both")
                     }
                     geoIsContains -> {
                         viewModel.searchLocationMsmObj(mGeoLocation!!, query!!)
