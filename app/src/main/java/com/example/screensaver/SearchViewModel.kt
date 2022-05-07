@@ -12,7 +12,6 @@ class SearchViewModel : ViewModel() {
     private val searchApi: SearchApi = SearchApi()
     var msmObjLiveData = MutableLiveData<MuseumObject>()
     var initialMsmObjLiveData = MutableLiveData<MuseumObject>()
-    var locationMsmObjLiveData = MutableLiveData<MuseumObject>()
     var artOjt = MutableLiveData<ArtOjt>()
 
 
@@ -31,6 +30,12 @@ class SearchViewModel : ViewModel() {
     fun searchLocationMsmObj(location: String, query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             msmObjLiveData.postValue(searchApi.searchLocalMsmObj(location, query))
+        }
+    }
+
+    fun searchMediumMsmObj(medium: String, query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            msmObjLiveData.postValue(searchApi.searchMediumMsmObj(medium, query))
         }
     }
 

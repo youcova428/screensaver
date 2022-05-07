@@ -29,7 +29,8 @@ class ArtListFragment : Fragment() {
     private var mArtSearchView: SearchView? = null
     private var mArtImageMutableList = mutableListOf<Art>()
     private var mArtImageProgress: ProgressBar? = null
-    private var mChipText: String? = null
+    private var mGeoLocation: String? = null
+    private var mMedium: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +46,8 @@ class ArtListFragment : Fragment() {
         mArtImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
         mArtSearchView = view.findViewById(R.id.art_simple_search_view)
         val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
+        val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
+        val mediumChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_medium)
 
         // 検索バーの設置　
         mArtSearchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -55,10 +58,41 @@ class ArtListFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // 検索ボタンを押下されたらリストが初期化される。
                 mArtImageMutableList = mutableListOf()
-                query?.let { q ->
-                    mChipText?.let { location ->
-                        viewModel.searchLocationMsmObj(location, q)
-                    } ?: viewModel.searchMuseumObject(q)
+
+                val geoChipBoolList = mutableListOf<Boolean>().apply {
+                    geoChipGroup.children.forEach {
+                        Log.d("tag", (it as Chip).isChecked.toString())
+                        add(it.isChecked)
+                    }
+                }
+
+                val mediumChipBoolList = mutableListOf<Boolean>().apply {
+                    mediumChipGroup.children.forEach {
+                        Log.d("tag", (it as Chip).isChecked.toString())
+                        add(it.isChecked)
+                    }
+                }
+
+                val geoIsContains = geoChipBoolList.contains(true)
+                val mediumContains = mediumChipBoolList.contains(true)
+
+                when {
+                    geoIsContains && mediumContains -> {
+                        // todo geoLocation と medium　の検索条件の場合
+                        Log.d("tag", "chipどっちもON")
+                    }
+                    geoIsContains -> {
+                        viewModel.searchLocationMsmObj(mGeoLocation!!, query!!)
+                        Log.d("tag", "chip geoLocation")
+                    }
+                    mediumContains -> {
+                        viewModel.searchMediumMsmObj(mMedium!!, query!!)
+                        Log.d("tag", "chip medium")
+                    }
+                    else -> {
+                        query?.let { viewModel.searchMuseumObject(it) }
+                        Log.d("tag", "chip条件なし")
+                    }
                 }
                 return false
             }
@@ -79,23 +113,28 @@ class ArtListFragment : Fragment() {
         viewModel.msmObjLiveData.observe(viewLifecycleOwner) {
             if (mArtImageMutableList.isEmpty()) {
                 searchResultSet(it)
+                // チェックを外す
+                geoChipGroup.clearCheck()
+                mediumChipGroup.clearCheck()
             }
         }
 
         // ChipGroup設置
-        val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
+        geoChipGroup.clearCheck()
         geoChipGroup.children.forEach {
             (it as Chip).setOnClickListener { chip ->
-                mChipText = (chip as Chip).text as String?
-                Log.d("tag", "$mChipText")
+                mGeoLocation = (chip as Chip).text as String?
+                val checkBool = chip.isChecked
+                Log.d("tag", "$mGeoLocation, クリックされている$checkBool")
             }
         }
 
-        val mediumChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_medium)
+        mediumChipGroup.clearCheck()
         mediumChipGroup.children.forEach {
-            (it as Chip).setOnClickListener {
-                val chipText = (it as Chip).text
-                Log.d("tag", "$chipText")
+            (it as Chip).setOnClickListener { chip ->
+                mMedium = (chip as Chip).text as String?
+                val checkBool = chip.isChecked
+                Log.d("tag", "$mMedium, クリックされている$checkBool")
             }
         }
 
@@ -139,7 +178,7 @@ class ArtListFragment : Fragment() {
 
     private fun searchResultSet(msmObject: MuseumObject) {
         var nowValue = 0
-        mArtImageProgress?.max = 10
+        mArtImageProgress?.max = 20
         mArtImageProgress?.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.Main).launch {
             for (id in msmObject.objectIDs) {

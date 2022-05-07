@@ -50,6 +50,23 @@ class SearchApi {
         return null
     }
 
+    suspend fun searchMediumMsmObj(
+        medium: String,
+        query: String,
+    ): MuseumObject? {
+        try {
+            val response = museumObjectService.getDetailMediumSearch(true, medium, query)
+            if (response.isSuccessful) {
+                return response.body()
+            } else {
+                Log.d("tag", "GET ERROR")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
     suspend fun searchArt(id: String): ArtOjt? {
         try {
             val response = artService.getArt(id)

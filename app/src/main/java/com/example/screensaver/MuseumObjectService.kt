@@ -23,6 +23,14 @@ interface MuseumObjectService {
         @Query("geoLocation") geoLocation: String,
         @Query("q") searchWord: String
     ): Response<MuseumObject>
+
+    //　検索条件 画像付き 表現手段
+    @GET("search")
+    suspend fun getDetailMediumSearch(
+        @Query("hasImages") hasImages : Boolean = true,
+        @Query("medium") medium: String,
+        @Query("q") searchWord: String
+    ): Response<MuseumObject>
 }
 
 
