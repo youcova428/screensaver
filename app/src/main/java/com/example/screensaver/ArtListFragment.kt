@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.annotation.WorkerThread
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
@@ -19,7 +18,10 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ArtListFragment : Fragment() {
 
@@ -27,6 +29,7 @@ class ArtListFragment : Fragment() {
     private var mArtSearchView: SearchView? = null
     private var mArtImageMutableList = mutableListOf<Art>()
     private var mArtImageProgress: ProgressBar? = null
+    private var mChipText: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +55,11 @@ class ArtListFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // 検索ボタンを押下されたらリストが初期化される。
                 mArtImageMutableList = mutableListOf()
-                query?.let { viewModel.searchMuseumObject(it) }
+                query?.let { q ->
+                    mChipText?.let { location ->
+                        viewModel.searchLocationMsmObj(location, q)
+                    } ?: viewModel.searchMuseumObject(q)
+                }
                 return false
             }
         })
@@ -78,9 +85,9 @@ class ArtListFragment : Fragment() {
         // ChipGroup設置
         val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
         geoChipGroup.children.forEach {
-            (it as Chip).setOnClickListener {
-                val chipText = (it as Chip).text
-                Log.d("tag", "$chipText")
+            (it as Chip).setOnClickListener { chip ->
+                mChipText = (chip as Chip).text as String?
+                Log.d("tag", "$mChipText")
             }
         }
 

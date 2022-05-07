@@ -33,10 +33,27 @@ class SearchApi {
         return null
     }
 
-    suspend fun searchArt(id:String) : ArtOjt? {
-        try{
+    suspend fun searchLocalMsmObj(
+        location: String,
+        query: String,
+    ): MuseumObject? {
+        try {
+            val response = museumObjectService.getDetailLocationSearch(true, location, query)
+            if (response.isSuccessful) {
+                return response.body()
+            } else {
+                Log.d("tag", "GET ERROR")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    suspend fun searchArt(id: String): ArtOjt? {
+        try {
             val response = artService.getArt(id)
-            if(response.isSuccessful) {
+            if (response.isSuccessful) {
                 return response.body()
             } else {
                 Log.d("tag", "GET ERROR")

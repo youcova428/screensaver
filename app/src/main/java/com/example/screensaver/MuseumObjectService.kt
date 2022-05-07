@@ -1,20 +1,28 @@
 package com.example.screensaver
 
 import com.squareup.moshi.Json
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MuseumObjectService {
 
-    // 検索用のURLを書く
+    // 条件なし検索
     @GET("search")
     suspend fun getMuseumObject (
         // 検索するためのクエリ
         @Query("q") searchWord: String?
     ): Response<MuseumObject>
 
-    // todo Chipが押下された際の検索
+    // 検索条件　画像付き　地域
+    @GET("search")
+    suspend fun getDetailLocationSearch(
+        @Query("hasImages") hasImages : Boolean = true,
+        @Query("geoLocation") geoLocation: String,
+        @Query("q") searchWord: String
+    ): Response<MuseumObject>
 }
 
 
