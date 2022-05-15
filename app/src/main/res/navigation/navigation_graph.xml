@@ -16,8 +16,14 @@
             <argument
                 android:name="artObjectId"
                 app:argType="string"
-                android:defaultValue=""/>
+                android:defaultValue="" />
+<!--            <argument-->
+<!--                android:name="museumObjectIds"-->
+<!--                app:argType="Art[]"-->
+<!--                android:defaultValue= "@null"-->
+<!--                app:nullable="true" />-->
         </action>
+
     </fragment>
 
     <fragment
@@ -29,6 +35,11 @@
             android:name="artObjectId"
             android:defaultValue=""
             app:argType="string" />
+<!--        <action-->
+<!--            android:id="@+id/action_art_detail_fragment_to_art_list_fragment3"-->
+<!--            app:destination="@id/art_list_fragment"-->
+<!--            app:popUpTo="@id/art_list_fragment"-->
+<!--            app:popUpToInclusive="true"/>-->
     </fragment>
 
 </navigation>

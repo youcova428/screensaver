@@ -35,10 +35,15 @@ class MuseumActivity : AppCompatActivity() {
         super.onStart()
     }
 
-    fun navigateToArtDetail(artId: String) {
+    fun navigateToArtDetail(artId: String ,artList: MutableList<Art>) {
+        val artArrayList = ArrayList<Art>()
+        for (art in artList)  {
+            artArrayList.add(art)
+        }
         val fragment = ArtDetailFragment()
         val args = Bundle().apply {
             putString("ArtId", artId)
+            putParcelableArrayList("ArtList", artArrayList)
         }
         fragment.arguments = args
         supportFragmentManager.beginTransaction()

@@ -1,11 +1,9 @@
 package com.example.screensaver
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
@@ -14,7 +12,7 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
     private lateinit var listener: OnArtItemClickListener
 
     interface OnArtItemClickListener {
-        fun OnArtItemClick(art: Art , view: View)
+        fun OnArtItemClick(art: Art, view: View, artList: MutableList<Art>)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -34,7 +32,7 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
         Glide.with(holder.imageView!!.context).load(artList[position].primaryImage)
             .into(holder.imageView!!)
         holder.imageView?.setOnClickListener {
-            listener.OnArtItemClick(artList[position], it)
+            listener.OnArtItemClick(artList[position], it, artList)
         }
     }
 

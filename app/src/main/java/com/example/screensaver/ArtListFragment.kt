@@ -115,6 +115,7 @@ class ArtListFragment : Fragment() {
         viewModel.msmObjLiveData.observe(viewLifecycleOwner) {
             if (mArtImageMutableList.isEmpty()) {
                 searchResultSet(it)
+
                 // チェックを外す
                 geoChipGroup.clearCheck()
                 mediumChipGroup.clearCheck()
@@ -169,11 +170,11 @@ class ArtListFragment : Fragment() {
                 }
         }
         artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
-            override fun OnArtItemClick(art: Art, view: View) {
+            override fun OnArtItemClick(art: Art, view: View, artList: MutableList<Art>) {
                 Toast.makeText(mView.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
                 //ArtDetailFragmentへの遷移
-                (requireActivity() as MuseumActivity).navigateToArtDetail(art.objectId)
+                (requireActivity() as MuseumActivity).navigateToArtDetail(art.objectId, artList)
             }
         })
     }

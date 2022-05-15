@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +53,12 @@ class ArtDetailFragment : Fragment() {
 
         //ArtListFragmentからid受け取り
         val id = arguments?.get("ArtId") as String
+        val artList = arguments?.get("ArtList") as ArrayList<Art>
+        println("====== 詳細画面に遷移して取得したArtList =======")
+        for(art in artList) {
+            Log.d("tag", art.title)
+        }
+
         viewModel.searchArtObject(id)
         viewModel.artOjt.observe(viewLifecycleOwner) {
             mArtDetail = it

@@ -1,9 +1,12 @@
 package com.example.screensaver
 
+import android.os.Parcel
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
-class Art {
+@Serializable
+class Art(parcel: Parcel) : Parcelable {
 
     @SerializedName("objectID")
     val objectId: String = ""
@@ -47,4 +50,22 @@ class Art {
     @SerializedName("title")
     val  title :String = ""
 
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+        TODO("Not yet implemented")
+    }
+
+    companion object CREATOR : Parcelable.Creator<Art> {
+        override fun createFromParcel(source: Parcel?): Art {
+           return Art(source!!)
+        }
+
+        override fun newArray(size: Int): Array<Art?> {
+            return arrayOfNulls(size)
+        }
+    }
 }
