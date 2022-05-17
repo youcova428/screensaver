@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -141,7 +142,9 @@ class ArtListFragment : Fragment() {
             }
         }
 
-
+        viewModel.artListLiveData.observe(viewLifecycleOwner) {
+            setUpRecyclerView(it.toMutableList())
+        }
     }
 
     @WorkerThread

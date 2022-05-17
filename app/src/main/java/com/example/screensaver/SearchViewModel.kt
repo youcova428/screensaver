@@ -13,6 +13,7 @@ class SearchViewModel : ViewModel() {
     var msmObjLiveData = MutableLiveData<MuseumObject>()
     var initialMsmObjLiveData = MutableLiveData<MuseumObject>()
     var artOjt = MutableLiveData<ArtOjt>()
+    var artListLiveData = MutableLiveData<ArrayList<Art>>()
 
 
     fun searchMuseumObject(query: String) {
@@ -49,5 +50,9 @@ class SearchViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             artOjt.postValue(searchApi.searchArt(id))
         }
+    }
+
+    fun backToArtListFragment(artList : ArrayList<Art>) {
+        artListLiveData.postValue(artList)
     }
 }

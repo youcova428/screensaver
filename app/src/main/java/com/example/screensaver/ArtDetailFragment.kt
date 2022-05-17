@@ -14,8 +14,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -53,11 +57,6 @@ class ArtDetailFragment : Fragment() {
 
         //ArtListFragmentからid受け取り
         val id = arguments?.get("ArtId") as String
-        val artList = arguments?.get("ArtList") as ArrayList<Art>
-        println("====== 詳細画面に遷移して取得したArtList =======")
-        for(art in artList) {
-            Log.d("tag", art.title)
-        }
 
         viewModel.searchArtObject(id)
         viewModel.artOjt.observe(viewLifecycleOwner) {
@@ -71,6 +70,23 @@ class ArtDetailFragment : Fragment() {
                 downloadArtImage(requireContext(), mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val artArrayList = arguments?.get("ArtList") as ArrayList<Art>
+                // viewModel
+                viewModel.backToArtListFragment(artArrayList)
+                val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+                if(fragmentManager.backStackEntryCount >0) {
+                    fragmentManager.popBackStack()
+                } else {
+                    activity?.supportFragmentManager?.popBackStack()
+                }
+            }
+        })
+
+
+
     }
 
     private fun downloadArtImage(context: Context, artUri: String, title: String) {
