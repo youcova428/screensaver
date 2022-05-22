@@ -5,17 +5,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.screensaver.databinding.FragmentArtListBinding
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
@@ -25,10 +23,9 @@ import kotlinx.coroutines.withContext
 
 class ArtListFragment : Fragment() {
 
+    private lateinit var binding: FragmentArtListBinding
     lateinit var mView: View
-    private var mArtSearchView: SearchView? = null
     private var mArtImageMutableList = mutableListOf<Art>()
-    private var mArtImageProgress: ProgressBar? = null
     private var mGeoLocation: String? = null
     private var mMedium: String? = null
     private val viewModel : SearchViewModel by activityViewModels()
@@ -42,16 +39,11 @@ class ArtListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentArtListBinding.bind(view)
         mView = view
 
-        mArtImageProgress = view.findViewById(R.id.art_image_progress)
-        mArtSearchView = view.findViewById(R.id.art_simple_search_view)
-
-        val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
-        val mediumChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_medium)
-
         // 検索バーの設置　
-        mArtSearchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
@@ -62,7 +54,7 @@ class ArtListFragment : Fragment() {
 
                 val geoChipBoolList = mutableListOf<Boolean>().apply {
                     println("===== GeoLocationChipGroup ====")
-                    geoChipGroup.children.forEach {
+                    binding.chipGroupGeolocation.children.forEach {
                         Log.d("tag", (it as Chip).isChecked.toString())
                         add(it.isChecked)
                     }
@@ -70,7 +62,7 @@ class ArtListFragment : Fragment() {
 
                 val mediumChipBoolList = mutableListOf<Boolean>().apply {
                     println("===== MediumChipGroup ====")
-                    mediumChipGroup.children.forEach {
+                    binding.chipGroupMedium.children.forEach {
                         Log.d("tag", (it as Chip).isChecked.toString())
                         add(it.isChecked)
                     }
@@ -117,14 +109,14 @@ class ArtListFragment : Fragment() {
             if (mArtImageMutableList.isEmpty()) {
                 searchResultSet(it)
                 // チェックを外す
-                geoChipGroup.clearCheck()
-                mediumChipGroup.clearCheck()
+                binding.chipGroupGeolocation.clearCheck()
+                binding.chipGroupMedium.clearCheck()
             }
         }
 
         // ChipGroup設置
-        geoChipGroup.clearCheck()
-        geoChipGroup.children.forEach {
+        binding.chipGroupGeolocation.clearCheck()
+        binding.chipGroupGeolocation.children.forEach {
             (it as Chip).setOnClickListener { chip ->
                 mGeoLocation = (chip as Chip).text as String?
                 val checkBool = chip.isChecked
@@ -132,8 +124,8 @@ class ArtListFragment : Fragment() {
             }
         }
 
-        mediumChipGroup.clearCheck()
-        mediumChipGroup.children.forEach {
+        binding.chipGroupMedium.clearCheck()
+        binding.chipGroupMedium.children.forEach {
             (it as Chip).setOnClickListener { chip ->
                 mMedium = (chip as Chip).text as String?
                 val checkBool = chip.isChecked
@@ -143,7 +135,7 @@ class ArtListFragment : Fragment() {
 
         viewModel.artListLiveData.observe(viewLifecycleOwner) {
             Log.d("tag", "artListLiveData start")
-            mArtImageProgress?.visibility = View.INVISIBLE
+            binding.progressBar.visibility = View.INVISIBLE
             setUpRecyclerView(it.toMutableList())
         }
     }
@@ -161,13 +153,12 @@ class ArtListFragment : Fragment() {
 
     private fun setUpRecyclerView(artList: MutableList<Art>) {
         val artAdapter = ArtAdapter(artList)
-        val recyclerview = mView.findViewById<RecyclerView>(R.id.art_recyclerview)
-        with(recyclerview) {
+        with(binding.recyclerview) {
             adapter = artAdapter
             layoutManager =
                 StaggeredGridLayoutManager(
                     2,
-                    androidx.recyclerview.widget.StaggeredGridLayoutManager.VERTICAL
+                    StaggeredGridLayoutManager.VERTICAL
                 ).apply {
                     gapStrategy =
                         androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
@@ -185,12 +176,12 @@ class ArtListFragment : Fragment() {
 
     private fun searchResultSet(msmObject: MuseumObject) {
         var nowValue = 0
-        mArtImageProgress?.max = 20
-        mArtImageProgress?.visibility = View.VISIBLE
+        binding.progressBar.max = 20
+        binding.progressBar.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.Main).launch {
             for (id in msmObject.objectIDs) {
-                if (nowValue == mArtImageProgress?.max) {
-                    mArtImageProgress?.visibility = View.INVISIBLE
+                if (nowValue == binding.progressBar.max) {
+                    binding.progressBar.visibility = View.INVISIBLE
                     setUpRecyclerView(mArtImageMutableList)
                     return@launch
                 }
