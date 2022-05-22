@@ -53,6 +53,6 @@ class SearchViewModel : ViewModel() {
     }
 
     fun backToArtListFragment(artList : ArrayList<Art>) {
-        artListLiveData.postValue(artList)
+        artListLiveData.value = artList
     }
 }

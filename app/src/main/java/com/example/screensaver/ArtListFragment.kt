@@ -11,8 +11,7 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.chip.Chip
@@ -32,6 +31,7 @@ class ArtListFragment : Fragment() {
     private var mArtImageProgress: ProgressBar? = null
     private var mGeoLocation: String? = null
     private var mMedium: String? = null
+    private val viewModel : SearchViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,9 +44,9 @@ class ArtListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mView = view
 
-        mArtImageProgress = view.findViewById<ProgressBar>(R.id.art_image_progress)
+        mArtImageProgress = view.findViewById(R.id.art_image_progress)
         mArtSearchView = view.findViewById(R.id.art_simple_search_view)
-        val viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
+
         val geoChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_geolocation)
         val mediumChipGroup = view.findViewById<ChipGroup>(R.id.chip_group_medium)
 
@@ -116,7 +116,6 @@ class ArtListFragment : Fragment() {
         viewModel.msmObjLiveData.observe(viewLifecycleOwner) {
             if (mArtImageMutableList.isEmpty()) {
                 searchResultSet(it)
-
                 // チェックを外す
                 geoChipGroup.clearCheck()
                 mediumChipGroup.clearCheck()
@@ -143,6 +142,8 @@ class ArtListFragment : Fragment() {
         }
 
         viewModel.artListLiveData.observe(viewLifecycleOwner) {
+            Log.d("tag", "artListLiveData start")
+            mArtImageProgress?.visibility = View.INVISIBLE
             setUpRecyclerView(it.toMutableList())
         }
     }
