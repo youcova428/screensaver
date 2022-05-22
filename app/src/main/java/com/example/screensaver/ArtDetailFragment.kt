@@ -11,12 +11,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.example.screensaver.databinding.FragmentArtDetailBinding
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,8 +30,7 @@ import java.net.URL
 @DelicateCoroutinesApi
 class ArtDetailFragment : Fragment() {
 
-    private var mImageView: ImageView? = null
-    private var mDownloadButton: Button? = null
+    private lateinit var binding: FragmentArtDetailBinding
     private var mArtDetail: ArtOjt? = null
     private val mViewModel : SearchViewModel by activityViewModels()
 
@@ -45,8 +43,7 @@ class ArtDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mImageView = view.findViewById(R.id.art_detail_image)
-        mDownloadButton = view.findViewById(R.id.art_detail_download_button)
+        binding = FragmentArtDetailBinding.bind(view)
 
         //ArtListFragmentからid受け取り
         val id = arguments?.get("ArtId") as String
@@ -55,10 +52,10 @@ class ArtDetailFragment : Fragment() {
         mViewModel.artOjt.observe(viewLifecycleOwner) {
             mArtDetail = it
             Glide.with(this@ArtDetailFragment).load(it.primaryImage)
-                        .into(view.findViewById(R.id.art_detail_image))
+                        .into(binding.detailImage)
         }
 
-        mDownloadButton?.setOnClickListener {
+        binding.downloadButton.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 downloadArtImage(requireContext(), mArtDetail!!.primaryImage, mArtDetail!!.title)
             }
