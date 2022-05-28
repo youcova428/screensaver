@@ -105,7 +105,6 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
      */
     fun removeItem(position: Int): MutableList<Uri> {
         this.dataSet.removeAt(position)
-        notifyDataSetChanged()
         return this.dataSet
     }
 

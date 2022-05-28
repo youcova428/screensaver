@@ -208,6 +208,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             override fun OnItemLongClick(position: Int) {
                 removedUriList = itemAdapter.removeItem(position)
                 itemAdapter.notifyItemRemoved(position)
+                itemAdapter.notifyItemRangeChanged(position, removedUriList.size)
                 mPrefUtils!!.saveUriSet(URI_COLLECTION, uriListConvert(removedUriList))
             }
         })
