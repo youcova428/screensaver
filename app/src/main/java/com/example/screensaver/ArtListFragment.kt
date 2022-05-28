@@ -161,11 +161,11 @@ class ArtListFragment : Fragment() {
                     StaggeredGridLayoutManager.VERTICAL
                 ).apply {
                     gapStrategy =
-                        androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                        androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
                 }
         }
         artAdapter.setOnArtItemClickListener(object : ArtAdapter.OnArtItemClickListener {
-            override fun OnArtItemClick(art: Art, view: View, artList: MutableList<Art>) {
+            override fun onArtItemClick(art: Art, view: View, artList: MutableList<Art>) {
                 Toast.makeText(mView.context, "${art.title}がタップされた。", Toast.LENGTH_SHORT)
                     .show()
                 //ArtDetailFragmentへの遷移

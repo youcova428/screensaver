@@ -5,14 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
 
 class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapter.ViewHolder>() {
 
     private lateinit var listener: OnArtItemClickListener
 
     interface OnArtItemClickListener {
-        fun OnArtItemClick(art: Art, view: View, artList: MutableList<Art>)
+        fun onArtItemClick(art: Art, view: View, artList: MutableList<Art>)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,10 +29,11 @@ class ArtAdapter(var artList: MutableList<Art>) : RecyclerView.Adapter<ArtAdapte
     }
 
     override fun onBindViewHolder(holder: ArtAdapter.ViewHolder, position: Int) {
-        Glide.with(holder.imageView!!.context).load(artList[position].primaryImage)
-            .into(holder.imageView!!)
-        holder.imageView?.setOnClickListener {
-            listener.OnArtItemClick(artList[position], it, artList)
+        holder.imageView?.let {
+            it.load(artList[position].primaryImage)
+            it.setOnClickListener {
+                listener.onArtItemClick(artList[position], it, artList)
+            }
         }
     }
 
