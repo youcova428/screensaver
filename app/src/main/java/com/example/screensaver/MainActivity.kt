@@ -8,22 +8,19 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.screensaver.databinding.ActivityMainBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
 class MainActivity : FragmentActivity(R.layout.activity_main) {
 
+    private lateinit var binding: ActivityMainBinding
     var mUriList: MutableList<Image>? = null
     lateinit var itemAdapter: UriAdapter
     var saveMutableList: MutableList<Image>? = null
     var mPrefUtils: PrefUtils? = null
-    private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerview_list) }
-    private var mToolBar : MaterialToolbar? = null
 
     companion object {
         const val URI_COLLECTION = "uri_collection"
@@ -33,11 +30,15 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
         mUriList = mutableListOf()
         mPrefUtils = PrefUtils.with(applicationContext)
 
         // toolbar 設定アイコン画面遷移
-        mToolBar = findViewById<MaterialToolbar>(R.id.top_toolbar).apply {
+        binding.topToolbar.apply {
             title = getString(R.string.app_name)
             setOnMenuItemClickListener {
                 val shownFragment = supportFragmentManager.findFragmentById(R.id.main_container)
@@ -65,8 +66,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
 
         // bottom navigation　installation
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)
-        bottomNav.setOnItemSelectedListener {
+        binding.bottomNavigationBar.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.setting_screen_saver ->
                     startActivity(Intent(Settings.ACTION_DREAM_SETTINGS))
@@ -88,7 +88,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
 
     override fun onBackPressed() {
-        mToolBar?.navigationIcon = null
+        binding.topToolbar.navigationIcon = null
         super.onBackPressed()
     }
 
@@ -97,8 +97,8 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
      */
     private val multiActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uriList ->
-            var permissionUriList: MutableList<Uri> = mutableListOf()
-            if (uriList != null && uriList.size != 0) {
+            val permissionUriList: MutableList<Uri> = mutableListOf()
+            if (!uriList.isNullOrEmpty()) {
                 //SAFから取得したUriにアクセス権限を付与する。
                 for (uri in uriList) {
                     contentResolver.takePersistableUriPermission(
@@ -107,8 +107,11 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     )
                     permissionUriList.add(uri)
                 }
+
+                saveMutableList = mPrefUtils?.getUriArray(URI_COLLECTION)
+
                 //SharedPreferencesからUriを取得できたとき
-                if (saveMutableList!!.isNotEmpty() && saveMutableList != null) {
+                if (!saveMutableList.isNullOrEmpty()) {
                     val addUriSet =
                         createAddUriList(imageListConvert(saveMutableList!!), permissionUriList)
                     if (addUriSet != imageListConvert(saveMutableList!!).toMutableSet()) {
@@ -120,7 +123,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     mPrefUtils?.saveUriSet(URI_COLLECTION, convertImageSet)
                 } else {
                     //1度立ち上げたが、SharedPreferencesに保存されていない場合
-                    if (recyclerView.layoutManager != null) {
+                    binding.recyclerView.layoutManager?.let {
                         //uriListが場合
                         val addUriSet =
                             createAddUriList(imageListConvert(saveMutableList!!), permissionUriList)
@@ -134,19 +137,18 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                             URI_COLLECTION,
                             convertImageSet,
                         )
-                    } else {
-                        //RecyclerViewが設置されていない場合(初回), SharedPreferencesからUriSetを取得する
-                        setUpRecyclerView(permissionUriList)
-                        if (!permissionUriList.isNullOrEmpty()) {
-                            itemAdapter.updateItem(permissionUriList.toTypedArray())
-                            itemAdapter.notifyDataSetChanged()
-                        }
-                        //タップから取得したuriListをSharedPreferencesに保存する。
-                        mPrefUtils!!.saveUriSet(
-                            URI_COLLECTION,
-                            uriListConvert(permissionUriList),
-                        )
+                    } ?:
+                    //RecyclerViewが設置されていない場合(初回), SharedPreferencesからUriSetを取得する
+                    setUpRecyclerView(permissionUriList)
+                    if (!permissionUriList.isNullOrEmpty()) {
+                        itemAdapter.updateItem(permissionUriList.toTypedArray())
+                        itemAdapter.notifyDataSetChanged()
                     }
+                    //タップから取得したuriListをSharedPreferencesに保存する。
+                    mPrefUtils!!.saveUriSet(
+                        URI_COLLECTION,
+                        uriListConvert(permissionUriList),
+                    )
                 }
             }
         }
@@ -164,7 +166,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
      */
     private fun setUpRecyclerView(uriList: MutableList<Uri>) {
         itemAdapter = UriAdapter(uriList, applicationContext)
-        with(recyclerView) {
+        with(binding.recyclerView) {
             adapter = itemAdapter
             layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
@@ -220,7 +222,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         exitingList: MutableList<Uri>,
         uriList: MutableList<Uri>
     ): Set<Uri> {
-        val addUriList = exitingList!!.union(uriList)
+        val addUriList = exitingList.union(uriList)
         for (addListUri in addUriList) {
             Log.d("tag", "画像追加 ${addListUri.toString()}")
         }

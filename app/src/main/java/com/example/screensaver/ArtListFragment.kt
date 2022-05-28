@@ -153,7 +153,7 @@ class ArtListFragment : Fragment() {
 
     private fun setUpRecyclerView(artList: MutableList<Art>) {
         val artAdapter = ArtAdapter(artList)
-        with(binding.recyclerview) {
+        with(binding.recyclerView) {
             adapter = artAdapter
             layoutManager =
                 StaggeredGridLayoutManager(
