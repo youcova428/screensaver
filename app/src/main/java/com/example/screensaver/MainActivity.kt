@@ -116,7 +116,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                         createAddUriList(imageListConvert(saveMutableList!!), permissionUriList)
                     if (addUriSet != imageListConvert(saveMutableList!!).toMutableSet()) {
                         itemAdapter.updateItem(addUriSet.toTypedArray())
-                        itemAdapter.notifyDataSetChanged()
+                        itemAdapter.notifyItemRangeChanged(0, addUriSet.size)
                     }
                     //Set<Uri> -> Set<Image>へ変換する。
                     val convertImageSet = addUriSet.map { Image(it.toString()) }.toSet()
@@ -129,7 +129,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                             createAddUriList(imageListConvert(saveMutableList!!), permissionUriList)
                         if (addUriSet != saveMutableList) {
                             itemAdapter.updateItem(addUriSet.toTypedArray())
-                            itemAdapter.notifyDataSetChanged()
+                            itemAdapter.notifyItemRangeChanged(0, addUriSet.size)
                         }
                         val convertImageSet = addUriSet.map { Image(it.toString()) }.toSet()
                         //sharedPreference追加する
@@ -142,7 +142,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                     setUpRecyclerView(permissionUriList)
                     if (!permissionUriList.isNullOrEmpty()) {
                         itemAdapter.updateItem(permissionUriList.toTypedArray())
-                        itemAdapter.notifyDataSetChanged()
+                        itemAdapter.notifyItemRangeChanged(0, permissionUriList.size)
                     }
                     //タップから取得したuriListをSharedPreferencesに保存する。
                     mPrefUtils!!.saveUriSet(
@@ -170,7 +170,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             adapter = itemAdapter
             layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
-                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
                 }
         }
         //ItemClickListener実装

@@ -1,16 +1,13 @@
 package com.example.screensaver
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION.SDK_INT
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 
 class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Context) :
     RecyclerView.Adapter<UriAdapter.ViewHolder>() {
@@ -61,13 +58,15 @@ class UriAdapter(private val dataSet: MutableList<Uri>,private val context: Cont
      * @param position 配列の位置
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView?.setImageURI(dataSet[position])
-        holder.imageView?.setOnClickListener {
-            listener.OnItemClick(dataSet[position])
-        }
-        holder.imageView?.setOnLongClickListener {
-            longClickListener.OnItemLongClick(position)
-            return@setOnLongClickListener true
+        holder.imageView?.let {
+            it.load(dataSet[position])
+            it.setOnClickListener {
+                listener.OnItemClick(dataSet[position])
+            }
+            it.setOnLongClickListener {
+                longClickListener.OnItemLongClick(position)
+                return@setOnLongClickListener true
+            }
         }
     }
 
