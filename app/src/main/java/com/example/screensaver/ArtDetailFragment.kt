@@ -15,12 +15,16 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.screensaver.databinding.FragmentArtDetailBinding
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.URL
 
 
@@ -51,8 +55,11 @@ class ArtDetailFragment : Fragment() {
         mViewModel.searchArtObject(id)
         mViewModel.artOjt.observe(viewLifecycleOwner) {
             mArtDetail = it
-            Glide.with(this@ArtDetailFragment).load(it.primaryImage)
-                        .into(binding.detailImage)
+            Glide.with(this@ArtDetailFragment)
+                .load(it.primaryImage)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(binding.detailImage)
         }
 
         binding.downloadButton.setOnClickListener {
